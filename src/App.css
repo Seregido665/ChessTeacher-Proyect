@@ -1,0 +1,23 @@
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("img/FondoInicio.jpg"); /* ruta relativa */
+  background-size: cover;       /* cubre toda la pantalla */
+  background-position: center;  /* centrada */
+  background-repeat: no-repeat; /* evita repeticiones */
+  background-attachment: fixed; /* permanece fija al hacer scroll */
+  font-family: sans-serif;
+}
+
+.imgLogo {
+  width: 100%;
+  max-width: 60px;
+}
+
+.intro {
+  color: antiquewhite;
+  font-style: italic;
+  font-size: 28px;
+}

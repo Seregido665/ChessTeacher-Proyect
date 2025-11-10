@@ -1,0 +1,48 @@
+.btn-special {
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 60px;
+    cursor: pointer;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    width: 360px;   /* ancho fijo */
+    padding: 10px 20px; /* opcional: altura y relleno del botón */
+    margin-bottom: 20px;
+}
+
+.verde {
+    background-color: #5CD176; /* Verde similar */
+}
+.verde:hover {
+    background-color: #3fad59;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
+.verde:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
+}
+
+
+.azul {
+    background-color: #5cb6d1; /* Verde similar */
+}
+.azul:hover {
+    background-color: #4a8fc7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
+.azul:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Contenedor de los botones */
+.inicioSesion {
+  text-align: center;
+}
