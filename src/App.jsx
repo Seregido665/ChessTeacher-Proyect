@@ -1,52 +1,46 @@
-
-import Button from './components/bbuttons/button'
+import {  Routes, Route } from "react-router-dom";
+import Registrarse from "./views/inicioApp/registrarse/registrarse"
+import Sesion from "./views/inicioApp/inicioSesion/inicioSesion"
+import Inicio from "./views/inicioApp/mainInicio/mainInicio"
 import './App.css'
 
 function App() {
 
+/*const App = () => {
+  const { pathname } = useLocation()        ----->  PARA SABER LA UBICACION EN LA QUE ESTAS 
+                                            --> Y EVITAR QUE ACCEDAN ANTES DE TIEMPO A
+  return (
+    <div>
+      {pathname !== '/404' && <Navbar />}
+
+      <Routes>
+        <Route path="/todos" element={<Todos />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/404" element={<Error404 />} />
+        <Route path="*" element={
+          <div>
+            <h1>Welcome to the App</h1>
+          </div>
+        } />
+      </Routes>
+    </div>
+  )
+}*/
+
+
+
   return (
    <>
       <div>
-        <div>
-          <div className="row w-100 m-0">
-            <div className="col-xl-5 col-md-5 col-12"></div>
-            <div className="col-xl-7 col-md-7 col-12 d-flex align-items-center">
-              <section className="inicioSesion">
-
-                <div>
-                  <img className="imgLogo" src="./img/logoChessW.png"/>    
-                </div>
-
-                <div className="pb-5 pt-3">
-                  <p className="intro">
-                    Bienvenido a tu entrenamiento <br /> personal
-                    de ajedrez.
-                  </p>
-                </div>
-
-                  <Button
-                    size="large"
-                    type="primary"
-                    text="REGISTRARSE."
-                    color="verde"
-                    action={() => {
-                      console.log('Ver detalles')
-                    }}
-                  />
-                  <Button
-                    size="large"
-                    type="primary"
-                    text="INICIAR SESIÓN."
-                    color="azul"
-                    action={() => {
-                      console.log('Ver detalles')
-                    }}
-                  />
-
-              </section>
-            </div>
-          </div>
-        </div>
+        <Routes>
+          <Route path="/registrarse" element={<Registrarse />} />
+          <Route path="/inicioSesion" element={<Sesion />} />
+          <Route path="/mainInicio" element={<Inicio />} />
+          <Route path="*" element={
+            <Inicio />
+          } />
+        </Routes>
+        
       </div>
     </>
   )

@@ -11,13 +11,3 @@ body {
   font-family: sans-serif;
 }
 
-.imgLogo {
-  width: 100%;
-  max-width: 60px;
-}
-
-.intro {
-  color: antiquewhite;
-  font-style: italic;
-  font-size: 28px;
-}
