@@ -1,0 +1,79 @@
+.fondo {
+  height: 100vh;
+  font-family: sans-serif;
+  display: flex;           /* Reemplaza align-items: center; que no funciona solo */
+  align-items: center;     /* Ahora sí funciona con display: flex */
+  justify-content: center; /* Opcional: centra horizontalmente si quieres */
+}
+
+.img-fondo1 {
+  background-image: url("img/FondoInicio.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.img-fondo2 {
+  position: relative;
+  overflow: hidden;
+}
+
+.img-fondo2::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("img/FondoInicio.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transform: scaleX(-1);   /* ← Esto voltea la imagen horizontalmente */
+  z-index: -1;
+}
+
+
+.imgLogo {
+  width: 100%;
+  max-width: 60px;
+}
+
+.intro {
+  color: antiquewhite;
+  font-style: italic;
+  font-size: 28px;
+}
+
+.titulo {
+  color: white;
+  font-size: 25px;
+}
+.subtitulo {
+  color: white;
+}
+input {
+  width: 75%;
+}
+.marco {
+  background-color: #cccccc13;
+  border-radius: 20px;
+}
+
+.simple {
+  background: none;         
+  border: none;                
+  color: white;             
+  text-decoration: underline;   
+  padding: 8px 16px;            
+  transition: all 0.2s ease;      /* Transición suave */
+}
+
+.simple:hover {
+  background-color: rgba(255, 255, 255, 0.15);  /* Blanco tenue */
+  border-radius: 6px;
+}
+
+.simple:active {
+  background-color: black;
+  border-radius: 6px;
+}
