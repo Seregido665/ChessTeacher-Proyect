@@ -3,7 +3,6 @@ import Registrarse from "./views/inicioApp/registrarse/registrarse"
 import Sesion from "./views/inicioApp/inicioSesion/inicioSesion"
 import Inicio from "./views/inicioApp/mainInicio/mainInicio"
 import Juego from "./views/game/game"
-import './App.css'
 
 function App() {
   return (

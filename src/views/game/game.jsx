@@ -1,32 +1,59 @@
 import "../styles/menustyle.css";
-//import Button from '../../../components/bbuttons/button'
-
+import "../../components/chessboard/board.css";
+import Chessboard from '../../components/chessboard/board';
+import AsideMenu from '../../components/asideMenu/aside';
 
 const Juego = () => {
-    
     return (
-        <div className="fondo img-fondo2">
-            <div>
-                <div className="row w-100 m-0">
-                    <div className="col-xl-5 col-md-5 col-12"></div>
-                    <div className="col-xl-7 col-md-7 col-12 d-flex align-items-center">
-                        <section className="inicioSesion">
-                            <div className="pb-3"> 
-                                <img className="imgLogo" src="../../img/logoChessW.png"/> 
-                            </div>
-                            <form action="/inicioSesion" class="formul" method="post">
-                                    <label htmlFor="nombre" className="subtitulo">Nombre de usuario:</label><br />
-                                    <input type="text" id="nombre" name="nombre" required /><br /><br />
+        <div className="vh-100 d-flex img-fondo2">
+            <div className="row w-100 m-0 flex-grow-1">
 
-                                    <label htmlFor="password" className="subtitulo">Contraseña:</label><br />
-                                    <input type="password" id="password" name="password" required /><br /><br />
-                                </form>
-                        </section>
+                <div className="col-xl-2 col-md-3 col-12 px-0 d-flex">
+                    <aside className="menuLateral w-100">
+                        <div className="d-flex flex-column">
+                            <AsideMenu />
+                        </div>
+                    </aside>
+                </div>
+
+                <div className="col-xl-6 col-md-6 col-12 d-flex align-items-center justify-content-center">
+                    <div>
+                        <div className="board-header">
+                            <div className="left">
+                                <img src="" className="profile-pic" />
+                            </div>
+                            <div>
+                                <span className="username fw-bold">Oponente</span>
+                            </div>
+                            <div className="right">
+                                <span id="top-timer" className="tiempo">00:00</span>
+                            </div>
+                        </div>
+                        <div>
+                            <Chessboard />
+                        </div>
+                        <div className="board-footer">
+                            <div className="left">
+                                <img src="" className="profile-pic" />
+                            </div>
+                            <div>
+                                <span className="username fw-bold">Seregido665</span>
+                            </div>
+                            <div className="right">
+                                <span id="bottom-timer" className="tiempo">00:00</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div className="col-xl-3 col-md-3 col-12">
+                    <section>
+                    </section>
+                </div>
+                <div className="col-xl-1"></div>
             </div>
         </div>
     );
-}
+};
 
 export default Juego;

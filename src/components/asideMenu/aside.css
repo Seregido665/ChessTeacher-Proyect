@@ -1,0 +1,9 @@
+.menuLateral {
+  height: 100vh;                    /* ocupa toda la altura */
+  background: #cfcfcf23;
+  backdrop-filter: blur(10px);      /* opcional: efecto cristal moderno */
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+  overflow-y: auto;
+}

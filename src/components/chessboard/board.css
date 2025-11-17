@@ -1,0 +1,61 @@
+/* TABLERO */
+.chessboard {
+  margin: 18px auto;
+  border: 10px solid #24ada700;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 700px;  
+  height: 700px;  
+  box-shadow: 0 0 10px rgba(241, 241, 241, 0.4);
+}
+.board-row {
+  display: flex;
+  flex: 1;
+}
+.square {
+  width: 100%;   
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
+}
+.square.light { background-color: #f0d9b5; }
+.square.dark  { background-color: #b58863; }
+
+.piece {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
+
+/* CABECERAS SUPERIOR E INFERIOR */
+.board-header, .board-footer {
+    width: 100%;                
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: rgba(236, 236, 236, 0.1);
+    color: #fff;
+    border-radius: 5px;
+}
+.profile-pic {
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+}
+.username {
+  font-size: 26px;
+}
+.tiempo {
+  font-size: 1.5rem;         
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgb(0, 0, 0);
+}
