@@ -1,9 +1,9 @@
 import './button.css'
 
-const Button = ({ type, size, text, action ,color }) => {
+const Button = ({ type, text, action ,color }) => {
   return (
     <button
-      className={`btn-special ${type} ${size} ${color}`}
+      className={`btn-special ${type} ${color}`}
       onClick={() => action()}
     >
       {text}

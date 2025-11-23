@@ -24,7 +24,6 @@ const Inicio = () => {
                   </div>
                   <div>
                     <Button
-                      size="large"
                       type="primary"
                       text="REGISTRARSE"
                       color="verde"
@@ -32,7 +31,6 @@ const Inicio = () => {
                     />
                     </div><div>
                     <Button
-                      size="large"
                       type="primary"
                       text="INICIAR SESIÓN"
                       color="azul"
