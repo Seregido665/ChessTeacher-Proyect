@@ -15,25 +15,32 @@ export default function AsideMenu() {
       </div>
       <nav className="menuNav">
         <ButtonLeft
-            img="/img/logoChessW.png"
+            img="/menuIcons/PlayW.png"
+            type="butStyle"
+            text="JUGAR"
+            //color="azul"
+            action={() => navigate("/game" )}
+        />
+        <ButtonLeft
+            img="/menuIcons/HistorialW.png"
             type="butStyle"
             text="HISTORIAL"
             //color="azul"
-            //action={() => console.log('Botón presionado')}
+            action={() => navigate("/history" )}
         />
         <ButtonLeft
-            img="/img/logoChessW.png"
+            img="/menuIcons/PuzzleW.png"
             type="butStyle"
             text="EJERCICIOS"
             //color="azul"
-            //action={() => console.log('Botón presionado')}
+            action={() => navigate("/exercises" )}
         />
         <ButtonLeft
-            img="/img/logoChessW.png"
+            img="/menuIcons/RulesW.png"
             type="butStyle"
             text="REGLAS BÁSICAS"
             //color="azul"
-            //action={() => console.log('Botón presionado')}
+            action={() => navigate("/rules" )}
         />
       </nav>
       <div className="spacer"></div>
@@ -52,7 +59,7 @@ export default function AsideMenu() {
         />
         <ButtonLeft
             img="/img/logoChessW.png"
-            type="exit enPlay"
+            typeExit="exit"
             text="SALIR"
             color="rojo"
             action={() => navigate("/mainInicio" )}

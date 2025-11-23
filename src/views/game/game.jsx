@@ -17,7 +17,7 @@ const Juego = () => {
                 </div>
 
                 <div className="col-xl-6 col-md-6 col-12 d-flex align-items-center justify-content-center">
-                    <div>
+                    <div className="flex-column max-w-800">
                         <div className="board-header">
                             <div className="left">
                                 <img src="" className="profile-pic" />

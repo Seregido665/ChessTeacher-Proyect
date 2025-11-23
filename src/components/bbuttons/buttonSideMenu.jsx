@@ -1,10 +1,10 @@
 import '../asideMenu/aside.css'
 
-const ButtonLeft = ({ text, action, img, type }) => {
+const ButtonLeft = ({ text, action, img, type, typeExit }) => {
   return (
     <div>
         <button
-        className={`menu-btn ${type}`}
+        className={`menu-btn ${typeExit} ${type}`}
         onClick={() => action()}
         >
         <img src={img} className="imgBut" />

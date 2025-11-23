@@ -11,6 +11,18 @@
   height: 700px;  
   box-shadow: 0 0 10px rgba(241, 241, 241, 0.4);
 }
+
+
+/* PARA PANTALLAS GRANDES*/
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .chessboard {
+    width: 950px;
+    height: 950px;
+    margin: 24px auto;
+  }
+}
+
+
 .board-row {
   display: flex;
   flex: 1;
@@ -33,7 +45,6 @@
 }
 
 
-/* CABECERAS SUPERIOR E INFERIOR */
 .board-header, .board-footer {
     width: 100%;                
     display: flex;
@@ -59,3 +70,4 @@
   color: #ffffff;
   text-shadow: 0 2px 8px rgb(0, 0, 0);
 }
+
