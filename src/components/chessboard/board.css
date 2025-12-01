@@ -1,7 +1,4 @@
 
-.all-data {
-  width: min(77vw, 77vh);
-}
 .chessboard {
   width: min(77vw, 77vh);
   height: min(77vw, 77vh);
@@ -9,6 +6,7 @@
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
+  margin: 10px;
 }
 
 
