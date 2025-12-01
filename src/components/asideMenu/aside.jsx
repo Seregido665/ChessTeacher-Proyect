@@ -18,28 +18,24 @@ export default function AsideMenu() {
             img="/menuIcons/PlayW.png"
             type="butStyle"
             text="JUGAR"
-            //color="azul"
             action={() => navigate("/game" )}
         />
         <ButtonLeft
             img="/menuIcons/HistorialW.png"
             type="butStyle"
             text="HISTORIAL"
-            //color="azul"
             action={() => navigate("/history" )}
         />
         <ButtonLeft
             img="/menuIcons/PuzzleW.png"
             type="butStyle"
             text="EJERCICIOS"
-            //color="azul"
             action={() => navigate("/exercises" )}
         />
         <ButtonLeft
             img="/menuIcons/RulesW.png"
             type="butStyle"
-            text="REGLAS BÁSICAS"
-            //color="azul"
+            text="REGLAS"
             action={() => navigate("/rules" )}
         />
       </nav>
@@ -61,7 +57,6 @@ export default function AsideMenu() {
             img="/img/logoChessW.png"
             typeExit="exit"
             text="SALIR"
-            color="rojo"
             action={() => navigate("/mainInicio" )}
         />
       </div>

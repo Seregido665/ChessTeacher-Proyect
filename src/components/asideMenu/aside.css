@@ -1,21 +1,19 @@
 .imgBut {
-  width: 100%;
-  max-width: 40px;
+  max-width: 30px;
 }
 
 .menuLateral {
-  width: 300px;                    /* Ancho cómodo */
+  width: 280px;                    /* Ancho cómodo */
   height: 100vh;
   background: #83838310;            /* Fondo negro/gris muy oscuro uniforme */
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;  
   left: 0;
   top: 0;
   overflow: hidden;
   box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  
 }
 
 .logo-container {
@@ -24,9 +22,10 @@
 }
 
 .logo {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   padding: 12px;
+  margin-top: 20px;
   background: rgb(20, 20, 20);
   border-radius: 50%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -56,7 +55,7 @@
 }
 
 .menuNav {
-  max-width: 100%;
+  max-width: 80%;
 }
 
 nav {
@@ -70,13 +69,13 @@ nav {
 }
 
 .exit {
-  width: 72%; 
-  height: 50px;                
-  margin: 20px auto 50px;            
+  width: 62%; 
+  height: 40px;                
+  margin: 20px 45px 25px;            
   justify-content: center;   
   background: #ff000085;  
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-style: bold;
   letter-spacing: 3.5px;
   border-radius: 3px;         
@@ -99,15 +98,20 @@ nav {
   filter: brightness(0) invert(1);
 }
 
-.bottons-button {
-  flex-direction: column;       
-  align-items: center;      
-  justify-content: center;  
-  width: 100%;   
-}
+
 
 .butStyle {
   background-color: #0000004f;
   color: white;
+  margin-bottom: 5px;
+  max-width: 90%;
+  margin: 0 auto; 
+  margin-bottom: 5px;
+  height: 45px;
 }
+ .text-but {
+    margin: 0 auto;
+    justify-content: center; /* centra verticalmente */
+    align-items: center;  
+ }
 

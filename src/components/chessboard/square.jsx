@@ -1,12 +1,13 @@
-import Piece from './piece';
+import Pieza from './piece';
 
-export default function Square({ piece, isLight, onClick }) {
+export default function Square({ piece, isLight, notation, onClick }) {
   return (
     <div
       className={`square ${isLight ? 'light' : 'dark'}`}
+      data-notation={notation}
       onClick={onClick}
     >
-      <Piece code={piece} />
+      {piece && <Pieza piece={piece} />}
     </div>
   );
 }

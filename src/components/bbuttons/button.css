@@ -47,8 +47,11 @@
 }
 
 .enPlay {
-  width: 100%;
-  padding: 7px 40px;
-  margin: 1px 0 10px;
-  border-radius: 50px;
+  padding: 3px;
+  margin: 10px 0px 0px 20px;
+  border-radius: 40px;
+  display: grid;
+  font-size: 17px;
+  flex-direction: column;    /* centra horizontalmente */
+  width: 80%;  
 }

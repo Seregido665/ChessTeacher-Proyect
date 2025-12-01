@@ -8,7 +8,7 @@ const ButtonLeft = ({ text, action, img, type, typeExit }) => {
         onClick={() => action()}
         >
         <img src={img} className="imgBut" />
-        {text}
+        <p className="text-but">{text}</p>
         </button>
     </div>
   )

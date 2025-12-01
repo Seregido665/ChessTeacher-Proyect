@@ -1,42 +1,45 @@
-/* TABLERO */
+
+.all-data {
+  width: min(77vw, 77vh);
+}
 .chessboard {
-  margin: 18px auto;
-  border: 10px solid #24ada700;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
+  width: min(77vw, 77vh);
+  height: min(77vw, 77vh);
+  box-shadow: 0 10px 30px rgba(167, 167, 167, 0.288);
+  display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
-  width: 700px;  
-  height: 700px;  
-  box-shadow: 0 0 10px rgba(241, 241, 241, 0.4);
-}
-
-
-/* PARA PANTALLAS GRANDES*/
-@media (min-width: 1920px) and (max-width: 2559px) {
-  .chessboard {
-    width: 950px;
-    height: 950px;
-    margin: 24px auto;
-  }
 }
 
 
 .board-row {
-  display: flex;
-  flex: 1;
+  display: contents; 
 }
+
+
 .square {
-  width: 100%;   
+  width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  align-items: center;
+  user-select: none;
+  position: relative;
 }
+
 .square.light { background-color: #f0d9b5; }
 .square.dark  { background-color: #b58863; }
+
+.board-header, .board-footer {
+  height: 50px;
+  width: 100%;                
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: rgba(236, 236, 236, 0.068);
+  color: #fff;
+  border-radius: 5px;
+}
 
 .piece {
   width: 90%;
@@ -45,25 +48,17 @@
 }
 
 
-.board-header, .board-footer {
-    width: 100%;                
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 15px;
-    background: rgba(236, 236, 236, 0.1);
-    color: #fff;
-    border-radius: 5px;
-}
+
 .profile-pic {
   width: 37px;
   height: 37px;
   border-radius: 50%;
 }
 .username {
-  font-size: 26px;
+  font-size: 22px;
 }
 .tiempo {
-  font-size: 1.5rem;         
+  font-size: 1.3rem;         
   font-weight: 600;
   letter-spacing: 2px;
   font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -71,3 +66,40 @@
   text-shadow: 0 2px 8px rgb(0, 0, 0);
 }
 
+
+
+
+
+
+
+
+.square.selected {
+  box-shadow: inset 0 0 0 4px #f5c26f;
+  background-color: #f5c26f88 !important;
+}
+
+.square.legal-move {
+  position: relative;
+}
+
+.square.legal-move::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #00ff0088;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.square.capture-move::after {
+  background: #ff000088;
+  width: 36px;
+  height: 36px;
+  border: 6px solid #ff000088;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
