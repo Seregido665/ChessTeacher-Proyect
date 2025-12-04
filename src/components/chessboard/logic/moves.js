@@ -1,11 +1,88 @@
 
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
+export function coordinates(row, col) {
+  return `${files[col]}${8 - row}`;
+}
+
 // Utilidad básica
 export const isInsideBoard = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
 
-// --- MOVIMIENTOS POR PIEZA (pseudo-legales) ---
+// --- OBTENER CASILLAS ATACADAS POR UN PEON ---
+export const getPawnAttacks = (row, col, color) => {
+  const attacks = [];
+  const direction = color === 'white' ? -1 : 1;
 
+  [-1, 1].forEach(offset => {
+    const aRow = row + direction;
+    const aCol = col + offset;
+    if (isInsideBoard(aRow, aCol)) {
+      attacks.push({ row: aRow, col: aCol });
+    }
+  });
+
+  return attacks;
+};
+
+// --- ENCONTRAR LA POSICIÓN DEL REY ---
+export const findKing = (board, color) => {
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece.type === 'king' && piece.color === color) {
+        return { row: r, col: c };
+      }
+    }
+  }
+  return null;
+};
+
+
+// --- OBTENER MOVIMIENTOS LEGALES ---
+export function getLegalMoves(row, col, board, color, lastMove = null, castling = {}) {
+  const piece = board[row][col];
+  if (!piece || piece.color !== color) return [];
+
+  const legalMoves = [];
+  const opponent = color === 'white' ? 'black' : 'white';
+
+  // MOVIMIENTOS PSEUDOLEGALES
+  getPseudoLegalMoves(row, col, board, lastMove).forEach(move => {
+    // Simular movimiento temporal
+    const backupBoard = board.map(r => r.map(p => (p ? { ...p } : null)));
+    const tempPiece = board[row][col];
+    const capturedPiece = board[move.row][move.col];
+
+    board[move.row][move.col] = tempPiece;
+    board[row][col] = null;
+
+    // Comprobar jaque
+    const kingPos = findKing(board, color);
+    const inCheck = board.some((r, ri) =>
+      r.some((p, ci) => p && p.color === opponent && getPseudoLegalMoves(ri, ci, board).some(m => m.row === kingPos.row && m.col === kingPos.col))
+    );
+
+    if (!inCheck) legalMoves.push(move);
+
+    // Restaurar tablero
+    board[row][col] = tempPiece;
+    board[move.row][move.col] = capturedPiece;
+  });
+
+  // Enroque (simplificado, se puede mejorar más adelante)
+  if (piece.type === 'king' && !castling[color + 'KingMoved'] && !board[row][col + 1] && !board[row][col + 2]) {
+    legalMoves.push({ row, col: col + 2 }); // enroque corto
+  }
+  if (piece.type === 'king' && !castling[color + 'KingMoved'] && !board[row][col - 1] && !board[row][col - 2] && !board[row][col - 3]) {
+    legalMoves.push({ row, col: col - 2 }); // enroque largo
+  }
+
+  return legalMoves;
+}
+
+
+
+// --- MOVIMIENTOS POR PIEZA (pseudo-legales) ---
 export const getPawnPseudoMoves = (row, col, color, board, lastMove) => {
   const moves = [];
   const direction = color === 'white' ? -1 : 1;
@@ -138,7 +215,7 @@ export const getPseudoLegalMoves = (row, col, board, lastMove = null) => {
 
   switch (type) {
     case 'pawn':   return getPawnPseudoMoves(row, col, color, board, lastMove);
-    case 'knight': return getKnightPseudoMoves(row, col, color, board);
+    case 'night': return getKnightPseudoMoves(row, col, color, board);
     case 'rook':   return getRookPseudoMoves(row, col, color, board);
     case 'bishop': return getBishopPseudoMoves(row, col, color, board);
     case 'queen':  return getQueenPseudoMoves(row, col, color, board);

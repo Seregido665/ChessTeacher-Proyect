@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import Square from './Square';
 import './board.css';
-
-import { getPseudoLegalMoves } from './logic/moves';
+import { getLegalMoves, coordinates, getPawnAttacks, findKing } from './logic/moves';
 
 // --- GENERAR EL TABLERO ---
 const createInitialBoard = () => {
@@ -23,6 +22,16 @@ export default function Chessboard() {
   const [legalMoves, setLegalMoves] = useState([]);
   const [currentTurn, setCurrentTurn] = useState('white');
   const [lastMove, setLastMove] = useState(null);
+  const [moveHistory, setMoveHistory] = useState([]);
+        // AL QUITAR LO COMENTADO DEL HTML SE QUITARA EL ERROR.
+  const [castlingRights, setCastlingRights] = useState({        // NO PREOCUPAR, ES PORQUE NO SE ESTAN USANDO.
+      whiteKingMoved: false,
+      blackKingMoved: false,
+      whiteRookKingsideMoved: false,
+      whiteRookQueensideMoved: false,
+      blackRookKingsideMoved: false,
+      blackRookQueensideMoved: false
+});
 
   // Mover pieza (incluye captura al paso)
   const movePiece = (fromRow, fromCol, toRow, toCol, enPassant = false) => {
@@ -36,6 +45,7 @@ export default function Chessboard() {
       const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
       newBoard[capturedRow][toCol] = null;
     }
+    
 
     setBoard(newBoard);
     setLastMove({
@@ -45,7 +55,18 @@ export default function Chessboard() {
       enPassant
     });
     setCurrentTurn(prev => prev === 'white' ? 'black' : 'white');
-  };
+
+    const fromNotation = coordinates(fromRow, fromCol);
+    const toNotation   = coordinates(toRow,   toCol);
+
+    const notation = enPassant
+      ? `${fromNotation}x${toNotation} e.p.`
+      : `${fromNotation} → ${toNotation}`;
+
+    console.log("Movimiento:", notation);
+
+    setMoveHistory(prev => [...prev, notation]);
+    };
 
   const handleSquareClick = (row, col) => {
     const piece = board[row][col];
@@ -72,7 +93,7 @@ export default function Chessboard() {
       // Seleccionar nueva pieza del mismo color
       if (piece && piece.color === currentTurn) {
         setSelectedSquare({ row, col });
-        setLegalMoves(getPseudoLegalMoves(row, col, board, lastMove));
+        setLegalMoves(getLegalMoves(row, col, board, currentTurn, lastMove, castlingRights));
         return;
       }
 
@@ -83,7 +104,7 @@ export default function Chessboard() {
       // Primer click
       if (piece && piece.color === currentTurn) {
         setSelectedSquare({ row, col });
-        setLegalMoves(getPseudoLegalMoves(row, col, board, lastMove));
+        setLegalMoves(getLegalMoves(row, col, board, currentTurn, lastMove, castlingRights));
       }
     }
   };
@@ -133,6 +154,17 @@ export default function Chessboard() {
           </div>
         ))}
       </div>
+
+      {/*}         CON ESTO SE VERA EL HISTORIAL EN PANTALLA
+      <div className="move-history">
+        <h3>Historial de movimientos</h3>
+        <ul>
+          {moveHistory.map((m, i) => (
+            <li key={i}>{m}</li>
+          ))}
+        </ul>
+      </div>
+      */}
     </div>
   );
 }
