@@ -1,12 +1,174 @@
-
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 export function coordinates(row, col) {
   return `${files[col]}${8 - row}`;
 }
 
-// Utilidad básica
 export const isInsideBoard = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+
+// --- MAKE / UNDO TEMP MOVE (OPTIMIZADO Y FUNCIONAL) ---
+export const makeTempMove = (board, castling, fromRow, fromCol, toRow, toCol, enPassant = false) => {
+  const backup = {
+    pieceMoved: board[fromRow][fromCol] ? { ...board[fromRow][fromCol] } : null,
+    pieceCaptured: board[toRow][toCol] ? { ...board[toRow][toCol] } : null,
+    enPassantCaptured: null,
+    enPassantPos: null,
+    castlingBefore: { ...castling },
+    rookFrom: null,
+    rookTo: null,
+    rookMoved: null
+  };
+
+  const piece = board[fromRow][fromCol];
+  if (!piece) return backup;
+
+  // Mover pieza
+  board[toRow][toCol] = piece;
+  board[fromRow][fromCol] = null;
+
+  // Captura al paso
+  if (enPassant && piece.type === 'pawn') {
+    const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
+    backup.enPassantCaptured = board[capturedRow][toCol] ? { ...board[capturedRow][toCol] } : null;
+    backup.enPassantPos = { row: capturedRow, col: toCol };
+    board[capturedRow][toCol] = null;
+  }
+
+  // Enroque (solo si el rey se mueve 2 casillas horizontalmente)
+  if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
+    const row = fromRow;
+    if (toCol > fromCol) {
+      // Enroque corto
+      board[row][5] = board[row][7];
+      board[row][7] = null;
+      backup.rookFrom = { row, col: 7 };
+      backup.rookTo = { row, col: 5 };
+      backup.rookMoved = board[row][5] ? { ...board[row][5] } : null;
+    } else {
+      // Enroque largo
+      board[row][3] = board[row][0];
+      board[row][0] = null;
+      backup.rookFrom = { row, col: 0 };
+      backup.rookTo = { row, col: 3 };
+      backup.rookMoved = board[row][3] ? { ...board[row][3] } : null;
+    }
+  }
+
+  // Actualizar derechos de enroque temporalmente
+  if (piece.type === 'king') {
+    castling[piece.color + 'KingMoved'] = true;
+    castling[piece.color + 'RookKingsideMoved'] = true;
+    castling[piece.color + 'RookQueensideMoved'] = true;
+  }
+  if (piece.type === 'rook') {
+    if (fromCol === 0) castling[piece.color + 'RookQueensideMoved'] = true;
+    if (fromCol === 7) castling[piece.color + 'RookKingsideMoved'] = true;
+  }
+
+  return backup;
+};
+
+export const undoTempMove = (board, castling, fromRow, fromCol, toRow, toCol, backup) => {
+  board[fromRow][fromCol] = backup.pieceMoved;
+  board[toRow][toCol] = backup.pieceCaptured;
+
+  if (backup.enPassantCaptured !== null) {
+    board[backup.enPassantPos.row][backup.enPassantPos.col] = backup.enPassantCaptured;
+  }
+
+  if (backup.rookFrom) {
+    board[backup.rookFrom.row][backup.rookFrom.col] = backup.rookMoved;
+    board[backup.rookTo.row][backup.rookTo.col] = null;
+  }
+
+  Object.assign(castling, backup.castlingBefore);
+};
+
+// --- OBTENER MOVIMIENTOS LEGALES (AHORA USA makeTempMove → MUCHO MÁS RÁPIDO) ---
+export function getLegalMoves(row, col, board, color, lastMove = null, castling = {}) {
+  const piece = board[row][col];
+  if (!piece || piece.color !== color) return [];
+
+  const legalMoves = [];
+  const opponent = color === 'white' ? 'black' : 'white';
+  const pseudoMoves = getPseudoLegalMoves(row, col, board, lastMove);
+
+  // Copia ligera del castling para modificarlo sin afectar el original
+  const castlingCopy = { ...castling };
+
+  for (const move of pseudoMoves) {
+    const backup = makeTempMove(
+      board,
+      castlingCopy,
+      row,
+      col,
+      move.row,
+      move.col,
+      !!move.enPassant
+    );
+
+    // Comprobamos si el rey queda en jaque después del movimiento
+    if (!isInCheck(board, color)) {
+      legalMoves.push(move);
+    }
+
+    // Restauramos todo
+    undoTempMove(board, castlingCopy, row, col, move.row, move.col, backup);
+  }
+
+  // === ENROQUE (se comprueba en el tablero original) ===
+  if (piece.type === 'king' && !castling[color + 'KingMoved']) {
+    const backRank = color === 'white' ? 7 : 0;
+
+    // Enroque corto
+    if (
+      col === 4 &&
+      !castling[color + 'RookKingsideMoved'] &&
+      !board[backRank][5] && !board[backRank][6] &&
+      !isInCheck(board, color) &&
+      !isSquareAttacked(board, backRank, 4, opponent) &&
+      !isSquareAttacked(board, backRank, 5, opponent) &&
+      !isSquareAttacked(board, backRank, 6, opponent)
+    ) {
+      legalMoves.push({ row: backRank, col: 6, castling: 'kingside' });
+    }
+
+    // Enroque largo
+    if (
+      col === 4 &&
+      !castling[color + 'RookQueensideMoved'] &&
+      !board[backRank][1] && !board[backRank][2] && !board[backRank][3] &&
+      !isInCheck(board, color) &&
+      !isSquareAttacked(board, backRank, 4, opponent) &&
+      !isSquareAttacked(board, backRank, 3, opponent) &&
+      !isSquareAttacked(board, backRank, 2, opponent)
+    ) {
+      legalMoves.push({ row: backRank, col: 2, castling: 'queenside' });
+    }
+  }
+
+  return legalMoves;
+}
+
+
+// --- FUNCION QUE REUNE TODOS LOS MOVIMIENTOS ---
+export const getPseudoLegalMoves = (row, col, board, lastMove = null) => {
+  const piece = board[row][col];
+  if (!piece) return [];
+
+  const { type, color } = piece;
+
+  switch (type) {
+    case 'pawn':   return getPawnPseudoMoves(row, col, color, board, lastMove);
+    case 'night': return getKnightPseudoMoves(row, col, color, board);
+    case 'rook':   return getRookPseudoMoves(row, col, color, board);
+    case 'bishop': return getBishopPseudoMoves(row, col, color, board);
+    case 'queen':  return getQueenPseudoMoves(row, col, color, board);
+    case 'king':   return getKingPseudoMoves(row, col, color, board);
+    default:       return [];
+  }
+};
+
 
 // --- OBTENER CASILLAS ATACADAS POR UN PEON ---
 export const getPawnAttacks = (row, col, color) => {
@@ -23,6 +185,19 @@ export const getPawnAttacks = (row, col, color) => {
 
   return attacks;
 };
+export const getPseudoAttacks = (row, col, board) => {
+  const piece = board[row][col];
+  if (!piece) return [];
+
+  // Los peones atacan diferente a como se mueven
+  if (piece.type === 'pawn') {
+    return getPawnAttacks(row, col, piece.color);
+  }
+
+  // Para el resto, los ataques = donde podrían mover si no hubiera jaque
+  return getPseudoLegalMoves(row, col, board);
+};
+
 
 // --- ENCONTRAR LA POSICIÓN DEL REY ---
 export const findKing = (board, color) => {
@@ -38,48 +213,42 @@ export const findKing = (board, color) => {
 };
 
 
-// --- OBTENER MOVIMIENTOS LEGALES ---
-export function getLegalMoves(row, col, board, color, lastMove = null, castling = {}) {
-  const piece = board[row][col];
-  if (!piece || piece.color !== color) return [];
+export const isInCheck = (board, color) => {
+  const kingPos = findKing(board, color);
+  if (!kingPos) return false;
 
-  const legalMoves = [];
   const opponent = color === 'white' ? 'black' : 'white';
 
-  // MOVIMIENTOS PSEUDOLEGALES
-  getPseudoLegalMoves(row, col, board, lastMove).forEach(move => {
-    // Simular movimiento temporal
-    const backupBoard = board.map(r => r.map(p => (p ? { ...p } : null)));
-    const tempPiece = board[row][col];
-    const capturedPiece = board[move.row][move.col];
-
-    board[move.row][move.col] = tempPiece;
-    board[row][col] = null;
-
-    // Comprobar jaque
-    const kingPos = findKing(board, color);
-    const inCheck = board.some((r, ri) =>
-      r.some((p, ci) => p && p.color === opponent && getPseudoLegalMoves(ri, ci, board).some(m => m.row === kingPos.row && m.col === kingPos.col))
-    );
-
-    if (!inCheck) legalMoves.push(move);
-
-    // Restaurar tablero
-    board[row][col] = tempPiece;
-    board[move.row][move.col] = capturedPiece;
-  });
-
-  // Enroque (simplificado, se puede mejorar más adelante)
-  if (piece.type === 'king' && !castling[color + 'KingMoved'] && !board[row][col + 1] && !board[row][col + 2]) {
-    legalMoves.push({ row, col: col + 2 }); // enroque corto
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece.color === opponent) {
+        const attacks = getPseudoAttacks(r, c, board, opponent);
+        
+        if (attacks.some(m => m.row === kingPos.row && m.col === kingPos.col)) {
+          return true;
+        }
+      }
+    }
   }
-  if (piece.type === 'king' && !castling[color + 'KingMoved'] && !board[row][col - 1] && !board[row][col - 2] && !board[row][col - 3]) {
-    legalMoves.push({ row, col: col - 2 }); // enroque largo
+  return false;
+};
+
+export const isSquareAttacked = (board, row, col, attackerColor) => {
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece.color === attackerColor) {
+        const attacks = getPseudoAttacks(r, c, board, attackerColor);
+        
+        if (attacks.some(m => m.row === row && m.col === col)) {
+          return true;
+        }
+      }
+    }
   }
-
-  return legalMoves;
-}
-
+  return false;
+};
 
 
 // --- MOVIMIENTOS POR PIEZA (pseudo-legales) ---
@@ -204,22 +373,21 @@ const getKingPseudoMoves = (row, col, color, board) => {
   return moves;
 };
 
-
-
-// --- FUNCION QUE REUNE TODOS LOS MOVIMIENTOS ---
-export const getPseudoLegalMoves = (row, col, board, lastMove = null) => {
-  const piece = board[row][col];
-  if (!piece) return [];
-
-  const { type, color } = piece;
-
-  switch (type) {
-    case 'pawn':   return getPawnPseudoMoves(row, col, color, board, lastMove);
-    case 'night': return getKnightPseudoMoves(row, col, color, board);
-    case 'rook':   return getRookPseudoMoves(row, col, color, board);
-    case 'bishop': return getBishopPseudoMoves(row, col, color, board);
-    case 'queen':  return getQueenPseudoMoves(row, col, color, board);
-    case 'king':   return getKingPseudoMoves(row, col, color, board);
-    default:       return [];
+export const hasLegalMoves = (board, color, lastMove = null, castling = {}) => {
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece.color === color) {
+        const moves = getLegalMoves(r, c, board, color, lastMove, castling);
+        if (moves.length > 0) return true;
+      }
+    }
   }
+  return false;
 };
+
+
+
+
+
+
