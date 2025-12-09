@@ -1,6 +1,6 @@
 import "../styles/menustyle.css";
 import "../../components/chessboard/board.css";
-import Chessboard from '../../components/chessboard/board';
+import Board from '../../components/chessboard/board';
 import AsideMenu from '../../components/asideMenu/aside';
 
 const Juego = () => {
@@ -25,7 +25,7 @@ const Juego = () => {
                         </div>
                     </div>
                     <div>
-                        <Chessboard />
+                        <Board />
                     </div>
                     <div className="board-footer">
                         <div>
