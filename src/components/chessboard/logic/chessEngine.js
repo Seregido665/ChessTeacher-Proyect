@@ -16,6 +16,7 @@ const createInitialBoard = () => {
 };
 
 
+
 // ---------- FUNCION CENTRARL ----------
 // --- CONTROLA TODA LA LOGICA Y ESTADO DEL TABLERO ---
 export default function useChessEngine() {
@@ -150,3 +151,50 @@ export default function useChessEngine() {
     resetGame
   };
 }
+
+
+
+
+
+
+// --- FUNCIONES AUXILIARES PARA LA IA ---
+// Copia del tablero para simulaciones
+export const copyBoard = (board) => {
+  return board.map(row => row.map(piece => piece ? { ...piece } : null));
+};
+
+// Ejecuta un movimiento en una copia del tablero (sin cambiar el estado)
+export const executeMoveCopy = (board, fromRow, fromCol, toRow, toCol, moveData = {}) => {
+  const newBoard = copyBoard(board);
+  const piece = newBoard[fromRow][fromCol];
+  
+  if (!piece) return newBoard;
+  
+  newBoard[toRow][toCol] = { ...piece };
+  newBoard[fromRow][fromCol] = null;
+  
+  // Captura al paso
+  if (moveData.enPassant) {
+    const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
+    newBoard[capturedRow][toCol] = null;
+  }
+  
+  // Enroques
+  if (moveData.castling) {
+    const row = piece.color === 'white' ? 7 : 0;
+    if (moveData.castling === 'kingside') {
+      newBoard[row][5] = newBoard[row][7];
+      newBoard[row][7] = null;
+    } else if (moveData.castling === 'queenside') {
+      newBoard[row][3] = newBoard[row][0];
+      newBoard[row][0] = null;
+    }
+  }
+  
+  return newBoard;
+};
+
+// Versión de getLegalMoves que funciona con cualquier tablero (para la IA)
+export const getLegalMovesForAI = (row, col, board, lastMove = null, castlingRights = {}) => {
+  return getLegalMoves(row, col, board, board[row][col]?.color || 'white', lastMove, castlingRights);
+};
