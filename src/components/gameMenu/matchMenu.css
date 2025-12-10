@@ -1,0 +1,94 @@
+/* Contenedor principal del menú */
+.match-menu-container {
+  color: rgb(238, 238, 238);
+  width: min(77vw, 77vh);
+  height: min(77vw, 77vh);
+  background: #8383832f;
+  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  margin-right: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Contenedor de los 3 botones de color */
+.color-selector {
+  justify-content: center;
+  display: flex;
+  gap: 25px;
+}
+
+.colorButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.colorButton.white {
+  background: white;
+}
+.colorButton.black {
+  background: black;
+}
+.colorButton.gradient {
+  background: linear-gradient(135deg, #ffffff, #d0d0d0, #707070, #000000);
+}
+
+.colorButton.selected {
+  border-color: #07eeffce;
+  transform: scale(1.2);
+}
+
+
+
+.matchButton {
+  width: 80%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 8px 20px; /* opcional: altura y relleno del botón */
+  margin-bottom: 25px;
+}
+.btn-matchMenu:hover {
+  transform: scale(1.03);
+}
+
+.inicio {
+  background: #28a745;            /* Verde */
+  color: white;
+}
+.inicio:hover {
+  background: #2fcf55;
+}
+
+.rendirse {
+  background: #b00000;            /* Rojo oscuro */
+  color: white;
+}
+.rendirse:hover {
+  background: #d40000;
+}
+
+
+.form-Select {
+    width: min(77vw, 77vh);
+  height: min(77vw, 77vh);
+
+}
+
+
+/* Historial 
+.history-container {
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 1rem;
+}
+*/

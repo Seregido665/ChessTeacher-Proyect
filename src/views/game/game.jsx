@@ -31,7 +31,7 @@ const Juego = () => {
         <div className="col-xl-6 col-md-6 col-12 flex-column d-flex align-items-center justify-content-center">
           <div className="all-data">
             <div className="board-header">
-              <div><span className="username">IA (Negras)</span></div>
+              <div><span className="username">Oponente</span></div>
               <div className="right"><span id="top-timer" className="tiempo">00:00</span></div>
             </div>
 
@@ -40,13 +40,10 @@ const Juego = () => {
               gameStarted={gameStarted}
               aiThinking={aiThinking}
               setAiThinking={setAiThinking}
-              onGameStart={handleStart}
-              onGameReset={handleReset}
-              
             />
 
             <div className="board-footer">
-              <div><span className="username">Seregido665 (Blancas)</span></div>
+              <div><span className="username">Seregido665</span></div>
               <div className="right"><span id="bottom-timer" className="tiempo">00:00</span></div>
             </div>
           </div>
@@ -57,8 +54,7 @@ const Juego = () => {
             gameStarted={gameStarted}
             aiThinking={aiThinking}
             onStartGame={handleStart}
-            onResetGame={handleReset}
-            onResign={handleReset}          
+            onResetGame={handleReset}       
             />
         </div>
 

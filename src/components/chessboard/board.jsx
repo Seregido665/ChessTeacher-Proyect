@@ -8,7 +8,7 @@ import './board.css';
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const AI_DEPTH = 3;
 
-export default function Chessboard({gameStarted, aiThinking, setAiThinking /*onGameStart, onGameReset*/ }) {
+export default function Chessboard({gameStarted, aiThinking, setAiThinking }) {
   const {
     board,
     currentTurn,

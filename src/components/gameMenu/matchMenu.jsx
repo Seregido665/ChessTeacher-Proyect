@@ -1,40 +1,57 @@
 import { useState } from 'react';
+import "./matchMenu.css";
 
 export default function MatchMenu({
   gameStarted,
-  aiThinking,
   onStartGame,
   onResetGame,
-  onResign, // opcional: para más adelante
-  moveHistory = [], // ← aquí recibirás el historial (string como "e2e4", "e7e5", etc.)
+  //moveHistory = [], // ← aquí recibirás el historial (string como "e2e4", "e7e5", etc.)
 }) {
-  // Estado local solo para opciones antes de empezar
+  
   const [difficulty, setDifficulty] = useState(3);
+  const [selectedColor, setSelectedColor] = useState("white");
 
   return (
-    <div className="match-menu h-100 d-flex flex-column p-4 text-white" style={{ maxWidth: '100%' }}>
-      <h3 className="text-center mb-4 fw-bold text-shadow">Chess Teacher</h3>
+    <div className="match-menu-container">
+      <h3 className="text-center mb-4 fw-bold">Personalizar partida.</h3>
 
-      {/* ==================================== */}
-      {/* MODO 1: ANTES DE EMPEZAR LA PARTIDA */}
-      {/* ==================================== */}
+      {/* --- MODO 1 --- */}
       {!gameStarted ? (
         <>
-          <div className="text-center mb-5">
+          <div className="text-center">
             <button
               onClick={onStartGame}
-              className="btn btn-success btn-lg px-5 py-3 w-100 shadow-lg hover-scale"
+              className="matchButton inicio"
             >
               Iniciar Partida
             </button>
           </div>
 
-          <h5 className="text-center mb-3">Configuración rápida</h5>
+
+          {/*       SELECTOR DE COLOR        */}
+          <div className=" mb-4">
+            <label className="form-label fw-bold">Color</label>
+            <div className="text-center color-selector">
+              <button
+                className={`colorButton white ${selectedColor === "white" ? "selected" : ""}`}
+                onClick={() => setSelectedColor("white")}
+              />
+              <button
+                className={`colorButton gradient ${selectedColor === "gradient" ? "selected" : ""}`}
+                onClick={() => setSelectedColor("gradient")}
+              />
+              <button
+                className={`colorButton black ${selectedColor === "black" ? "selected" : ""}`}
+                onClick={() => setSelectedColor("black")}
+              />
+            </div>
+          </div>
+
 
           <div className="mb-4">
-            <label className="form-label fw-bold">Dificultad de la IA</label>
+            <label className="form-label fw-bold">Dificultad</label>
             <select
-              className="form-select form-select-lg bg-dark text-white border-secondary"
+              className="form-select bg-dark text-white border-secondary"
               value={difficulty}
               onChange={(e) => setDifficulty(Number(e.target.value))}
             >
@@ -45,41 +62,22 @@ export default function MatchMenu({
           </div>
 
           <div className="text-center text-muted small">
-            Juegas con las <strong>Blancas</strong>
-            <br />
-            Minimax α-β · Profundidad: {difficulty}
+            Profundidad: {difficulty}
           </div>
         </>
       ) : (
         <>
-          {/* ==================================== */}
-          {/* MODO 2: PARTIDA EN CURSO */}
-          {/* ==================================== */}
+          {/* --- MODO 2 --- */}
           <div className="text-center mb-4">
             <button
               onClick={onResetGame}
-              className="btn btn-outline-warning btn-sm w-100 mb-2"
-            >
-              Reiniciar Partida
-            </button>
-            <button
-              onClick={onResign || onResetGame}
-              className="btn btn-outline-danger btn-sm w-100"
+              className="matchButton rendirse"
             >
               Rendirse
             </button>
           </div>
 
-          {/* Indicador de turno simple */}
-          <div className="text-center py-3 rounded bg-dark bg-opacity-50 mb-4">
-            {aiThinking ? (
-              <div className="text-warning fw-bold">IA pensando...</div>
-            ) : (
-              <div className="text-light fw-bold">Tu turno</div>
-            )}
-          </div>
-
-          {/* Historial de jugadas */}
+          {/* Historial de jugadas 
           <h5 className="text-center mb-3">Historial de jugadas</h5>
           <div className="flex-grow-1 overflow-auto bg-dark bg-opacity-30 rounded-3 p-3" style={{ maxHeight: '400px' }}>
             {moveHistory.length === 0 ? (
@@ -96,28 +94,9 @@ export default function MatchMenu({
                 ))}
               </div>
             )}
-          </div>
+          </div>*/}
         </>
       )}
-
-      {/* Estilos bonitos y limpios */}
-      <style jsx>{`
-        .hover-scale:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
-        }
-        .text-shadow {
-          text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-        }
-        .form-select {
-          background-color: #212529;
-        }
-        .form-select:focus {
-          background-color: #212529;
-          border-color: #0d6efd;
-          box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
-        }
-      `}</style>
     </div>
   );
 }
