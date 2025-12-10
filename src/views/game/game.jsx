@@ -9,8 +9,21 @@ const Juego = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [selectedColor, setSelectedColor] = useState("white");
+  const [difficulty, setDifficulty] = useState(3);
+  
 
-  const handleStart = () => setGameStarted(true);
+  const handleStart = () => {
+    let finalColor = selectedColor;
+
+    if (selectedColor === "gradient") {
+      // Elegir aleatoriamente entre 'white' y 'black'
+      finalColor = Math.random() < 0.5 ? "white" : "black";
+      setSelectedColor(finalColor); // Actualiza la selección para reflejar el resultado
+    }
+
+    setGameStarted(true);
+  };
 
   const handleReset = () => {
     setGameStarted(false);
@@ -31,7 +44,7 @@ const Juego = () => {
         <div className="col-xl-6 col-md-6 col-12 flex-column d-flex align-items-center justify-content-center">
           <div className="all-data">
             <div className="board-header">
-              <div><span className="username">Oponente</span></div>
+              <div><span className="username">Oponente </span></div>
               <div className="right"><span id="top-timer" className="tiempo">00:00</span></div>
             </div>
 
@@ -40,6 +53,8 @@ const Juego = () => {
               gameStarted={gameStarted}
               aiThinking={aiThinking}
               setAiThinking={setAiThinking}
+              playerColor={selectedColor === "black" ? "black" : "white"}
+              aiDepth={difficulty}
             />
 
             <div className="board-footer">
@@ -55,6 +70,9 @@ const Juego = () => {
             aiThinking={aiThinking}
             onStartGame={handleStart}
             onResetGame={handleReset}       
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            setDifficulty={setDifficulty} 
             />
         </div>
 

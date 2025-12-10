@@ -125,9 +125,9 @@ export default function useChessEngine() {
   };
 
   // - PARA REINICIAR LA PARTIDA -
-  const resetGame = () => {
+  const resetGame = (playerColor = 'white') => {
     setBoard(createInitialBoard());
-    setCurrentTurn('white');
+    setCurrentTurn(playerColor === 'white' ? 'white' : 'white');
     setLastMove(null);
     setMoveHistory([]);
     setCastlingRights({

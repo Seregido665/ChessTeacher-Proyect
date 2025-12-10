@@ -5,20 +5,22 @@ export default function MatchMenu({
   gameStarted,
   onStartGame,
   onResetGame,
+  selectedColor,
+  setSelectedColor,
   //moveHistory = [], // ← aquí recibirás el historial (string como "e2e4", "e7e5", etc.)
 }) {
   
   const [difficulty, setDifficulty] = useState(3);
-  const [selectedColor, setSelectedColor] = useState("white");
+  //const [selectedColor, setSelectedColor] = useState("white");
 
   return (
     <div className="match-menu-container">
-      <h3 className="text-center mb-4 fw-bold">Personalizar partida.</h3>
+      <h3 className="text-center mb-4 mt-3 fw-bold">Personalizar partida.</h3>
 
       {/* --- MODO 1 --- */}
       {!gameStarted ? (
         <>
-          <div className="text-center">
+          <div className="text-center mt-4 mb-2">
             <button
               onClick={onStartGame}
               className="matchButton inicio"
@@ -29,8 +31,8 @@ export default function MatchMenu({
 
 
           {/*       SELECTOR DE COLOR        */}
-          <div className=" mb-4">
-            <label className="form-label fw-bold">Color</label>
+          <div className="subMenu mb-2">
+            <label className="form-label fw-bold mb-1">Color</label>
             <div className="text-center color-selector">
               <button
                 className={`colorButton white ${selectedColor === "white" ? "selected" : ""}`}
@@ -48,22 +50,24 @@ export default function MatchMenu({
           </div>
 
 
-          <div className="mb-4">
-            <label className="form-label fw-bold">Dificultad</label>
+          <div className="subMenu mb-4">
+            <label className="form-label fw-bold mb-1">Dificultad</label>
             <select
               className="form-select bg-dark text-white border-secondary"
               value={difficulty}
               onChange={(e) => setDifficulty(Number(e.target.value))}
             >
-              <option value={1}>Fácil</option>
-              <option value={3} selected>Media</option>
-              <option value={5}>Difícil</option>
+              <option value={1}>Nivel 1 ( 800 - 1000 )</option>
+              <option value={2}>Nivel 2 ( 1000 - 1200 )</option>
+              <option value={3}>Nivel 3 ( 1200 - 1400 )</option>
+              <option value={4}>Nivel 4 ( 1400 - 1600 )</option>
+              <option value={5}>Nivel 5 ( 1600 - 1800 )</option>
+              <option value={6}>Nivel 6 ( 1800 - 2000 )</option>
+              <option value={7}>Nivel 7 ( +2000 )</option>
             </select>
           </div>
+          
 
-          <div className="text-center text-muted small">
-            Profundidad: {difficulty}
-          </div>
         </>
       ) : (
         <>

@@ -33,7 +33,7 @@ export const makeTempMove = (board, castling, fromRow, fromCol, toRow, toCol, en
     board[capturedRow][toCol] = null;
   }
 
-  // -- GUARDA LA POSICIO ANTES DE LOS ENROQUES --
+  // -- GUARDA LA POSICION ANTES DE LOS ENROQUES --
   if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
     const row = fromRow;
     if (toCol > fromCol) {

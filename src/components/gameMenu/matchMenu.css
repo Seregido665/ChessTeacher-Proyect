@@ -11,6 +11,12 @@
   overflow: hidden;
 }
 
+.subMenu {
+  padding: 5px 10px 10px 10px;
+  border-radius: 8px;
+  background-color: #0000005d;
+}
+
 /* Contenedor de los 3 botones de color */
 .color-selector {
   justify-content: center;
@@ -73,13 +79,6 @@
 }
 .rendirse:hover {
   background: #d40000;
-}
-
-
-.form-Select {
-    width: min(77vw, 77vh);
-  height: min(77vw, 77vh);
-
 }
 
 
