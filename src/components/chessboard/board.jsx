@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import Square from './Square';
 import useChessEngine from './logic/chessEngine';
-import { getBestMove } from './logic/chessAI';
-import { getLegalMovesForAI, executeMoveCopy } from './logic/chessEngine';
+import { getBestMove, getLegalMovesForAI, executeMoveCopy, evaluateBoard } from './logic/chessAI';
+import { toAlgebraicNotation } from './logic/boardUtils';
 import './board.css';
 
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-export default function Chessboard({gameStarted, playerColor, aiThinking, setAiThinking, aiDepth }) {
+export default function Chessboard({ onMove, gameStarted, playerColor, aiThinking, setAiThinking, aiDepth, onEvaluationChange }) {
   const {
     board,
     currentTurn,
@@ -20,19 +20,28 @@ export default function Chessboard({gameStarted, playerColor, aiThinking, setAiT
 
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [legalMoves, setLegalMoves] = useState([]);
-  //onst playerColor = 'white';
 
-  // IA juega cuando es su turno
+
+// --- CALCULA Y ENVÍA LA EVALUACIÓN CADA VEZ QUE CAMBIA EL TABLERO ---
+useEffect(() => {
+    if (gameStarted && onEvaluationChange) {
+      const evaluation = evaluateBoard(board);
+      onEvaluationChange(evaluation);
+    } else if (!gameStarted && onEvaluationChange) {
+      onEvaluationChange(0);
+    }
+  }, [board, gameStarted, onEvaluationChange]);
+
+  // --- PARA EL TURNO DE LA IA ---
 useEffect(() => {
   const aiColor = playerColor === 'white' ? 'black' : 'white';
-  if (gameStarted && playerColor === 'black' && currentTurn === aiColor && !promotionData && !aiThinking) {
-    
+  if (gameStarted && currentTurn === aiColor && !promotionData && !aiThinking) {
       setAiThinking(true);
 
       setTimeout(() => {
         const bestMove = getBestMove(
           board,
-          'white',
+          aiColor,
           aiDepth,
           (row, col, boardCopy) => getLegalMovesForAI(row, col, boardCopy, lastMove, castlingRights),
           executeMoveCopy
@@ -40,11 +49,22 @@ useEffect(() => {
 
         if (bestMove) {
           movePiece(bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol, bestMove.moveData);
+
+          const piece = board[bestMove.fromRow][bestMove.fromCol];
+          const algebraic = toAlgebraicNotation(board, {
+            fromRow: bestMove.fromRow,
+            fromCol: bestMove.fromCol,
+            toRow: bestMove.toRow,
+            toCol: bestMove.toCol,
+            ...bestMove
+          }, piece);
+
+          if (onMove) onMove(algebraic);
         }
         setAiThinking(false);
       }, 600);
     }
-  }, [currentTurn, gameStarted, board, promotionData, aiThinking, lastMove, castlingRights, movePiece, setAiThinking, playerColor, aiDepth]);
+  }, [currentTurn, gameStarted, board, promotionData, aiThinking, lastMove, castlingRights, movePiece, playerColor, aiDepth]);
 
   const handleSquareClick = (row, col) => {
     if (!gameStarted || aiThinking) return;
@@ -72,9 +92,13 @@ useEffect(() => {
     const validMove = legalMoves.find(m => m.row === actualRow && m.col === actualCol);
     if (validMove) {
       movePiece(fromRow, fromCol, actualRow, actualCol, validMove);
-      setSelectedSquare(null);
-      setLegalMoves([]);
-      return;
+
+      const piece = board[fromRow][fromCol];
+      const algebraic = toAlgebraicNotation(board, {
+        fromRow, fromCol, toRow: actualRow, toCol: actualCol, ...validMove
+      }, piece);
+
+      if (onMove) onMove(algebraic);
     }
 
     if (piece && piece.color === playerColor) {

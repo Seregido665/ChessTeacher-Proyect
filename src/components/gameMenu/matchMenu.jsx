@@ -7,20 +7,18 @@ export default function MatchMenu({
   onResetGame,
   selectedColor,
   setSelectedColor,
-  //moveHistory = [], // ← aquí recibirás el historial (string como "e2e4", "e7e5", etc.)
+  moveHistory = [], 
 }) {
   
   const [difficulty, setDifficulty] = useState(3);
-  //const [selectedColor, setSelectedColor] = useState("white");
 
   return (
     <div className="match-menu-container">
-      <h3 className="text-center mb-4 mt-3 fw-bold">Personalizar partida.</h3>
 
       {/* --- MODO 1 --- */}
       {!gameStarted ? (
         <>
-          <div className="text-center mt-4 mb-2">
+          <div className="text-center mt-5 mb-2">
             <button
               onClick={onStartGame}
               className="matchButton inicio"
@@ -29,11 +27,8 @@ export default function MatchMenu({
             </button>
           </div>
 
-
-          {/*       SELECTOR DE COLOR        */}
-          <div className="subMenu mb-2">
-            <label className="form-label fw-bold mb-1">Color</label>
-            <div className="text-center color-selector">
+          <div className="mb-3">
+            <div className="color-selector">
               <button
                 className={`colorButton white ${selectedColor === "white" ? "selected" : ""}`}
                 onClick={() => setSelectedColor("white")}
@@ -48,7 +43,6 @@ export default function MatchMenu({
               />
             </div>
           </div>
-
 
           <div className="subMenu mb-4">
             <label className="form-label fw-bold mb-1">Dificultad</label>
@@ -66,13 +60,32 @@ export default function MatchMenu({
               <option value={7}>Nivel 7 ( +2000 )</option>
             </select>
           </div>
-          
-
         </>
       ) : (
         <>
           {/* --- MODO 2 --- */}
-          <div className="text-center mb-4">
+          <h5 className="text-center mb-1">Historial</h5>
+          <div className="move-history mb-5">
+            <div className="move-table">
+              <div className="table-header">
+                <div>#</div>
+                <div>Blancas</div>
+                <div>Negras</div>
+              </div>
+
+              {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
+                  <div key={i} className="table-row">
+                    <div className="move-number">{i + 1}.</div>
+                    <div className="move-white">{moveHistory[i * 2] || ""}</div>
+                    <div className="move-black">{moveHistory[i * 2 + 1] || ""}</div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          
+          <div className="text-center">
             <button
               onClick={onResetGame}
               className="matchButton rendirse"
@@ -80,25 +93,6 @@ export default function MatchMenu({
               Rendirse
             </button>
           </div>
-
-          {/* Historial de jugadas 
-          <h5 className="text-center mb-3">Historial de jugadas</h5>
-          <div className="flex-grow-1 overflow-auto bg-dark bg-opacity-30 rounded-3 p-3" style={{ maxHeight: '400px' }}>
-            {moveHistory.length === 0 ? (
-              <p className="text-center text-muted small mb-0">Aún no hay jugadas</p>
-            ) : (
-              <div className="text-monospace small">
-                {moveHistory.map((move, index) => (
-                  <div key={index} className="d-flex">
-                    <span className="text-muted me-3">{Math.floor(index / 2) + 1}.</span>
-                    <span className={index % 2 === 0 ? 'text-light' : 'text-secondary'}>
-                      {move}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>*/}
         </>
       )}
     </div>

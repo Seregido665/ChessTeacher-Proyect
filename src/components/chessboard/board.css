@@ -2,7 +2,7 @@
 .chessboard {
   width: min(77vw, 77vh);
   height: min(77vw, 77vh);
-  box-shadow: 0 10px 30px rgba(167, 167, 167, 0.288);
+  box-shadow: 0 0px 15px rgba(167, 167, 167, 0.651);
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);

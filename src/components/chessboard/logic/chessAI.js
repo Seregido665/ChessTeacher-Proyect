@@ -1,4 +1,7 @@
-// --- CODIGO NECESARIO PARA EL FUNCIONAMIENTO DEL ALGORITMO "MINIMAX" ---
+import { getLegalMoves } from './legalMoves';
+
+
+// --- CODIGO NECESARIO PARA EL FUNCIONAMIENTO DEL ALGORITMO "MINIMAX CON PODA ALFA-BETA" ---
 // --- MOTOR DE AJEDREZ ELEGIDO PARA LA APLICACION ---
 // -- EVALUACIÓN DE LA POSICIÓN DEL TABLERO --
 const pieceValues = {
@@ -10,7 +13,6 @@ const pieceValues = {
   king: 20000
 };
 
-// Bonificaciones por posición (tablas simplificadas)
 const pawnTable = [
   0,  0,  0,  0,  0,  0,  0,  0,
   50, 50, 50, 50, 50, 50, 50, 50,
@@ -63,7 +65,6 @@ export function evaluateBoard(board) {
   return totalEvaluation;
 }
 
-// --- ALGORITMO MINIMAX CON PODA ALFA-BETA ---
 function minimax(board, depth, alpha, beta, isMaximizingPlayer, getLegalMovesForAI, executeMoveCopy) {
   if (depth === 0) {
     return evaluateBoard(board);
@@ -126,7 +127,7 @@ function getAllPossibleMoves(board, color, getLegalMovesForAI) {
   return moves;
 }
 
-// --- FUNCIÓN PRINCIPAL PARA OBTENER EL MEJOR MOVIMIENTO ---
+// --- FUNCIÓN PARA OBTENER EL MEJOR MOVIMIENTO ---
 export function getBestMove(board, color, depth, getLegalMovesForAI, executeMoveCopy) {
   const allMoves = getAllPossibleMoves(board, color, getLegalMovesForAI);
   
@@ -142,7 +143,7 @@ export function getBestMove(board, color, depth, getLegalMovesForAI, executeMove
       depth - 1, 
       -999999, 
       999999, 
-      color === 'black', // Si la IA es negra, el siguiente turno maximiza (blancas)
+      color === 'black', 
       getLegalMovesForAI,
       executeMoveCopy
     );
@@ -162,3 +163,44 @@ export function getBestMove(board, color, depth, getLegalMovesForAI, executeMove
   
   return bestMove;
 }
+
+// --- FUNCIONES AUXILIARES PARA LA IA ---
+const copyBoard = (board) => {
+  return board.map(row => row.map(piece => piece ? { ...piece } : null));
+};
+
+// -- EJECUTA EL MOVIMIENTO EN UNA COPIA DEL TABLERO --
+export const executeMoveCopy = (board, fromRow, fromCol, toRow, toCol, moveData = {}) => {
+  const newBoard = copyBoard(board);
+  const piece = newBoard[fromRow][fromCol];
+  
+  if (!piece) return newBoard;
+  
+  newBoard[toRow][toCol] = { ...piece };
+  newBoard[fromRow][fromCol] = null;
+  
+  // Captura al paso
+  if (moveData.enPassant) {
+    const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
+    newBoard[capturedRow][toCol] = null;
+  }
+  
+  // Enroques
+  if (moveData.castling) {
+    const row = piece.color === 'white' ? 7 : 0;
+    if (moveData.castling === 'kingside') {
+      newBoard[row][5] = newBoard[row][7];
+      newBoard[row][7] = null;
+    } else if (moveData.castling === 'queenside') {
+      newBoard[row][3] = newBoard[row][0];
+      newBoard[row][0] = null;
+    }
+  }
+  
+  return newBoard;
+};
+
+// Versión de getLegalMoves que funciona con cualquier tablero (para la IA)
+export const getLegalMovesForAI = (row, col, board, lastMove = null, castlingRights = {}) => {
+  return getLegalMoves(row, col, board, board[row][col]?.color || 'white', lastMove, castlingRights);
+};

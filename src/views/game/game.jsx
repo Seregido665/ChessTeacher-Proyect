@@ -3,6 +3,7 @@ import "../../components/chessboard/board.css";
 import Chessboard from '../../components/chessboard/board';
 import AsideMenu from '../../components/asideMenu/aside';
 import MatchMenu from '../../components/gameMenu/matchMenu';
+import EvaluationBar from '../../components/advantageBar/advantageBar';
 import { useState } from 'react';
 
 const Juego = () => {
@@ -11,6 +12,9 @@ const Juego = () => {
   const [resetKey, setResetKey] = useState(0);
   const [selectedColor, setSelectedColor] = useState("white");
   const [difficulty, setDifficulty] = useState(3);
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [boardEvaluation, setBoardEvaluation] = useState(0);
+
   
 
   const handleStart = () => {
@@ -28,6 +32,7 @@ const Juego = () => {
   const handleReset = () => {
     setGameStarted(false);
     setAiThinking(false);
+    setMoveHistory([]);
     setResetKey(prev => prev + 1); // FUERZA UN RESET COMPLETO DEL TABLERO.
   };
 
@@ -40,14 +45,17 @@ const Juego = () => {
             <AsideMenu />
           </aside>
         </div>
-
-        <div className="col-xl-6 col-md-6 col-12 flex-column d-flex align-items-center justify-content-center">
+            
+        <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
+          <EvaluationBar 
+              evaluation={boardEvaluation} 
+              gameStarted={gameStarted}
+          />
           <div className="all-data">
             <div className="board-header">
               <div><span className="username">Oponente </span></div>
               <div className="right"><span id="top-timer" className="tiempo">00:00</span></div>
             </div>
-
             <Chessboard
               key={resetKey}               
               gameStarted={gameStarted}
@@ -55,8 +63,9 @@ const Juego = () => {
               setAiThinking={setAiThinking}
               playerColor={selectedColor === "black" ? "black" : "white"}
               aiDepth={difficulty}
+              onMove={(moveNotation) => setMoveHistory(prev => [...prev, moveNotation])} 
+              onEvaluationChange={setBoardEvaluation}
             />
-
             <div className="board-footer">
               <div><span className="username">Seregido665</span></div>
               <div className="right"><span id="bottom-timer" className="tiempo">00:00</span></div>
@@ -73,6 +82,7 @@ const Juego = () => {
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
             setDifficulty={setDifficulty} 
+            moveHistory={moveHistory}
             />
         </div>
 

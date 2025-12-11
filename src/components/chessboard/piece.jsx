@@ -1,24 +1,9 @@
-/*export default function Pieza({ code }) {
-  if (!code) return null; 
-
-  const src = `/piezas/${code}.png`;
-
-  return (
-    <img
-      src={src}
-      alt={code}
-      className="piece"
-      draggable={false}      
-    />
-  );
-}*/
-
 export default function Pieza({ piece }) {
   if (!piece) return null;
 
   const { type, color } = piece;
   const colorLetter = color === 'white' ? 'w' : 'b';
-  const typeLetter = type.charAt(0).toUpperCase(); // p -> P, etc.
+  const typeLetter = type.charAt(0).toUpperCase();
   const code = colorLetter + typeLetter;
 
   return (

@@ -1,8 +1,47 @@
+export function toAlgebraicNotation(board, move, piece) {
+  const files = ['a','b','c','d','e','f','g','h'];
 
-// --- PARA PASAR LA CASILLA EN NOTACION DE AJEDREZ ---
-export function coordinates(row, col) {
-  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-  return `${files[col]}${8 - row}`;
+  // Coordenadas
+  const from = `${files[move.fromCol]}${8 - move.fromRow}`;
+  const to   = `${files[move.toCol]}${8 - move.toRow}`;
+
+  // ENROQUES
+  if (piece.type === "king") {
+    if (move.fromCol === 4 && move.toCol === 6) return "O-O";
+    if (move.fromCol === 4 && move.toCol === 2) return "O-O-O";
+  }
+
+  const pieceLetter = {
+    pawn: "",
+    night: "N",
+    bishop: "B",
+    rook: "R",
+    queen: "Q",
+    king: "K"
+  }[piece.type];
+
+  const destinationPiece = board[move.toRow][move.toCol];
+
+  const isCapture = !!destinationPiece;
+
+  // PEÓN CAPTURANDO → "exd5"
+  let algebraic = "";
+
+  if (piece.type === "pawn") {
+    if (isCapture) algebraic = `${from[0]}x${to}`;
+    else algebraic = to;
+  } else {
+    algebraic = pieceLetter;
+    if (isCapture) algebraic += "x";
+    algebraic += to;
+  }
+
+  // CORONACIÓN
+  if (move.moveData?.promotion) {
+    algebraic += "=" + move.moveData.promotion.toUpperCase();
+  }
+
+  return algebraic;
 }
 
 
