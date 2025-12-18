@@ -1,11 +1,11 @@
 export function toAlgebraicNotation(board, move, piece) {
   const files = ['a','b','c','d','e','f','g','h'];
 
-  // Coordenadas
+  // -- COORDENADAS --
   const from = `${files[move.fromCol]}${8 - move.fromRow}`;
   const to   = `${files[move.toCol]}${8 - move.toRow}`;
 
-  // ENROQUES
+  // -- ENROQUES --
   if (piece.type === "king") {
     if (move.fromCol === 4 && move.toCol === 6) return "O-O";
     if (move.fromCol === 4 && move.toCol === 2) return "O-O-O";
@@ -24,7 +24,7 @@ export function toAlgebraicNotation(board, move, piece) {
 
   const isCapture = !!destinationPiece;
 
-  // PEÓN CAPTURANDO → "exd5"
+  // -- PEÓN CAPTURANDO --
   let algebraic = "";
 
   if (piece.type === "pawn") {
@@ -36,7 +36,7 @@ export function toAlgebraicNotation(board, move, piece) {
     algebraic += to;
   }
 
-  // CORONACIÓN
+  // -- CORONACIÓN --
   if (move.moveData?.promotion) {
     algebraic += "=" + move.moveData.promotion.toUpperCase();
   }

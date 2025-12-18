@@ -20,8 +20,8 @@ const Juego = () => {
   const handleStart = () => {
     let finalColor = selectedColor;
 
+    // Elegir aleatoriamente entre 'white' y 'black'
     if (selectedColor === "gradient") {
-      // Elegir aleatoriamente entre 'white' y 'black'
       finalColor = Math.random() < 0.5 ? "white" : "black";
       setSelectedColor(finalColor); // Actualiza la selección para reflejar el resultado
     }
@@ -30,6 +30,10 @@ const Juego = () => {
   };
 
   const handleReset = () => {
+    // Determina quién ganó
+    const winner = selectedColor === "black" ? "BLANCAS" : "NEGRAS";
+    alert(`Te has rendido. ¡${winner} ganan!`);
+
     setGameStarted(false);
     setAiThinking(false);
     setMoveHistory([]);
@@ -46,11 +50,12 @@ const Juego = () => {
           </aside>
         </div>
             
-        <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
-          <EvaluationBar 
-              evaluation={boardEvaluation} 
-              gameStarted={gameStarted}
-          />
+        
+          <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
+          <EvaluationBar
+              evaluation={boardEvaluation}
+              playerColor={selectedColor === "black" ? "black" : "white"}
+            />
           <div className="all-data">
             <div className="board-header">
               <div><span className="username">Oponente </span></div>

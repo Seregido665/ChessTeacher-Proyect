@@ -15,7 +15,9 @@ export default function MatchMenu({
   return (
     <div className="match-menu-container">
 
+      {/*----------------*/}
       {/* --- MODO 1 --- */}
+      {/*----------------*/}
       {!gameStarted ? (
         <>
           <div className="text-center mt-5 mb-2">
@@ -63,7 +65,9 @@ export default function MatchMenu({
         </>
       ) : (
         <>
+          {/*----------------*/}
           {/* --- MODO 2 --- */}
+          {/*----------------*/}
           <h5 className="text-center mb-1">Historial</h5>
           <div className="move-history mb-5">
             <div className="move-table">

@@ -7,6 +7,8 @@ import { getPseudoLegalMoves, getLegalMoves } from './legalMoves.js'; // solo pa
 export const getPseudoAttacks = (row, col, board) => {
   const piece = board[row][col];
   if (!piece) return [];
+
+  // -- PORQUE NO COME IGUAL QUE COMO SE MUEVE --
   if (piece.type === 'pawn') return getPawnAttacks(row, col, piece.color);
   return getPseudoLegalMoves(row, col, board);
 };

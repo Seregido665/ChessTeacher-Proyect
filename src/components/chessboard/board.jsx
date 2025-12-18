@@ -62,7 +62,7 @@ useEffect(() => {
           if (onMove) onMove(algebraic);
         }
         setAiThinking(false);
-      }, 600);
+      }, 1000);
     }
   }, [currentTurn, gameStarted, board, promotionData, aiThinking, lastMove, castlingRights, movePiece, playerColor, aiDepth]);
 

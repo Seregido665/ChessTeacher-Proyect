@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { hasLegalMoves, isInCheck } from './checks';
+// chessEngine.js
+
+import { useState, useEffect } from 'react';  // Añadido useEffect
 import { getLegalMoves } from './legalMoves';
-//import { coordinates } from './boardUtils';
+import { checkGameEnd, getPositionKey } from './finalSituations';
 
-
-// --- CREA EL TABLERO INICIAL E INDICA DONDE VA CADA PIEZA ---
+// --- CREA EL TABLERO INICIAL ---
 const createInitialBoard = () => {
   const board = Array(8).fill(null).map(() => Array(8).fill(null));
   const backRow = ['rook', 'night', 'bishop', 'queen', 'king', 'bishop', 'night', 'rook'];
@@ -15,10 +15,7 @@ const createInitialBoard = () => {
   return board;
 };
 
-
-
-// ---------- FUNCION CENTRARL ----------
-// --- CONTROLA TODA LA LOGICA Y ESTADO DEL TABLERO ---
+// ---------- MOTOR PRINCIPAL DE AJEDREZ ----------
 export default function useChessEngine() {
   const [board, setBoard] = useState(createInitialBoard());
   const [currentTurn, setCurrentTurn] = useState('white');
@@ -33,13 +30,41 @@ export default function useChessEngine() {
     blackRookQueensideMoved: false
   });
   const [promotionData, setPromotionData] = useState(null);
+  const [halfMoveCounter, setHalfMoveCounter] = useState(0);
+  const [positionHistory, setPositionHistory] = useState(new Map());
+  const [gameOver, setGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState(null);
 
-  // -- CONTROLA Y TODO LO RELACIONADO CON MOVER PIEZAS --
+  // --- USEEFFECT PARA COMPROBAR FIN DE PARTIDA DESPUÉS DE ACTUALIZACIONES DE ESTADO (Y RENDER) ---
+  useEffect(() => {
+    if (!lastMove || gameOver) return; // Evita chequeo inicial o si ya terminó
+
+    const previousPlayerColor = lastMove.piece.color;
+
+    const end = checkGameEnd({
+      board,
+      currentTurn,
+      lastMove,
+      castlingRights,
+      halfMoveCounter,
+      positionHistory,
+      previousPlayerColor
+    });
+
+    if (end.over) {
+      alert(end.result);
+      setGameOver(true);
+      setGameResult(end.result);
+    }
+  }, [board, currentTurn, lastMove, castlingRights, halfMoveCounter, positionHistory, gameOver]);
+
   const executeMove = (fromRow, fromCol, toRow, toCol, moveData = {}, pieceOverride = null, promotedTo = null) => {
+    if (gameOver) return;
+
     const newBoard = board.map(r => r.map(p => p ? { ...p } : null));
     const piece = pieceOverride || { ...newBoard[fromRow][fromCol] };
 
-    // - PROMOCION -
+    // Promoción
     if (promotedTo) {
       newBoard[toRow][toCol] = { type: promotedTo, color: piece.color };
     } else {
@@ -47,23 +72,25 @@ export default function useChessEngine() {
     }
     newBoard[fromRow][fromCol] = null;
 
-    // - CAPTURA AL PASO -
+    // Captura al paso
     if (moveData.enPassant) {
       const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
       newBoard[capturedRow][toCol] = null;
     }
 
-    // - ENROQUES -
+    // Enroque
     if (moveData.castling) {
       const row = piece.color === 'white' ? 7 : 0;
       if (moveData.castling === 'kingside') {
-        newBoard[row][5] = newBoard[row][7]; newBoard[row][7] = null;
+        newBoard[row][5] = newBoard[row][7];
+        newBoard[row][7] = null;
       } else if (moveData.castling === 'queenside') {
-        newBoard[row][3] = newBoard[row][0]; newBoard[row][0] = null;
+        newBoard[row][3] = newBoard[row][0];
+        newBoard[row][0] = null;
       }
     }
 
-    // - ACTUALIZA ESTADO DE LOS ENROQUES -
+    // Actualizar derechos de enroque
     if (piece.type === 'king') {
       setCastlingRights(prev => ({
         ...prev,
@@ -77,25 +104,31 @@ export default function useChessEngine() {
       setCastlingRights(prev => ({ ...prev, [piece.color + side]: true }));
     }
 
+    // Aplicar cambios al estado
     setBoard(newBoard);
     setLastMove({ from: { row: fromRow, col: fromCol }, to: { row: toRow, col: toCol }, piece, promotedTo, ...moveData });
     setCurrentTurn(prev => prev === 'white' ? 'black' : 'white');
 
-    // - DETECTA JAQUE MATE Y AHOGADO -
-    const nextPlayer = piece.color === 'white' ? 'black' : 'white';
-    const kingInCheck = isInCheck(newBoard, nextPlayer);
-    const hasMoves = hasLegalMoves(newBoard, nextPlayer, lastMove, castlingRights);
-    if (!hasMoves) {
-      if (kingInCheck) {
-        alert(`¡JAQUE MATE! Ganaron las ${piece.color === 'white' ? 'BLANCAS' : 'NEGRAS'}`);
-      } else {
-        alert("¡TABLAS por ahogado!");
-      }
+    // Actualizar contador de 50 movimientos
+    let newHalfMoveCounter = halfMoveCounter + 1;
+    const isCapture = !!board[toRow][toCol] || moveData.enPassant;
+    if (piece.type === 'pawn' || isCapture) {
+      newHalfMoveCounter = 0;
     }
+    setHalfMoveCounter(newHalfMoveCounter);
+
+    // Actualizar historial de posiciones
+    const positionKey = getPositionKey(newBoard, currentTurn, castlingRights, lastMove);
+    const newPositionHistory = new Map(positionHistory);
+    const count = (newPositionHistory.get(positionKey) || 0) + 1;
+    newPositionHistory.set(positionKey, count);
+    setPositionHistory(newPositionHistory);
+
+    // NOTA: La comprobación de fin de partida se movió al useEffect para que ocurra DESPUÉS del render
   };
 
-  // - PARA MOVER LA PIEZA, Y CONTEMPLA LAS PROMOCIONES -
   const movePiece = (fromRow, fromCol, toRow, toCol, moveData = {}) => {
+    if (gameOver) return;
     const piece = board[fromRow][fromCol];
     if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
       setPromotionData({ fromRow, fromCol, toRow, toCol, pieceColor: piece.color, enPassant: !!moveData.enPassant });
@@ -104,25 +137,31 @@ export default function useChessEngine() {
     executeMove(fromRow, fromCol, toRow, toCol, moveData);
   };
 
-  // - DETERMINA EL MOVIMIENTO SEGUN LA PIEZA POR LA QUE SE QUIERA CAMBIAR EL PEON CORONADO -
   const handlePromotion = (type) => {
-    const { fromRow, fromCol, toRow, toCol, enPassant } = promotionData; 
+    if (gameOver) return;
+    const { fromRow, fromCol, toRow, toCol, enPassant } = promotionData;
     executeMove(fromRow, fromCol, toRow, toCol, { enPassant }, null, type);
     setPromotionData(null);
   };
 
-  // - PARA REINICIAR LA PARTIDA -
   const resetGame = (playerColor = 'white') => {
     setBoard(createInitialBoard());
     setCurrentTurn(playerColor === 'white' ? 'white' : 'white');
     setLastMove(null);
     setMoveHistory([]);
     setCastlingRights({
-      whiteKingMoved: false, blackKingMoved: false,
-      whiteRookKingsideMoved: false, whiteRookQueensideMoved: false,
-      blackRookKingsideMoved: false, blackRookQueensideMoved: false
+      whiteKingMoved: false,
+      blackKingMoved: false,
+      whiteRookKingsideMoved: false,
+      whiteRookQueensideMoved: false,
+      blackRookKingsideMoved: false,
+      blackRookQueensideMoved: false
     });
     setPromotionData(null);
+    setHalfMoveCounter(0);
+    setPositionHistory(new Map());
+    setGameOver(false);
+    setGameResult(null);
   };
 
   return {
@@ -134,13 +173,9 @@ export default function useChessEngine() {
     castlingRights,
     movePiece,
     handlePromotion,
-    getLegalMoves: (row, col) => getLegalMoves(row, col, board, currentTurn, lastMove, castlingRights),
-    resetGame
+    getLegalMoves: (row, col) => gameOver ? [] : getLegalMoves(row, col, board, currentTurn, lastMove, castlingRights),
+    resetGame,
+    gameOver,
+    gameResult
   };
 }
-
-
-
-
-
-
