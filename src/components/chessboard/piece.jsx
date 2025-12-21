@@ -2,8 +2,16 @@ export default function Pieza({ piece }) {
   if (!piece) return null;
 
   const { type, color } = piece;
+  const PIECE_LETTER = {
+    pawn: 'P',
+    knight: 'N',
+    bishop: 'B',
+    rook: 'R',
+    queen: 'Q',
+    king: 'K'
+  };
   const colorLetter = color === 'white' ? 'w' : 'b';
-  const typeLetter = type.charAt(0).toUpperCase();
+  const typeLetter = PIECE_LETTER[type];
   const code = colorLetter + typeLetter;
 
   return (

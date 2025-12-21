@@ -14,16 +14,17 @@ const Juego = () => {
   const [difficulty, setDifficulty] = useState(3);
   const [moveHistory, setMoveHistory] = useState([]);
   const [boardEvaluation, setBoardEvaluation] = useState(0);
+  const [showEvaluationBar, setShowEvaluationBar] = useState(true);
 
   
 
   const handleStart = () => {
     let finalColor = selectedColor;
 
-    // Elegir aleatoriamente entre 'white' y 'black'
+      // Elegir aleatoriamente entre 'white' y 'black'
     if (selectedColor === "gradient") {
       finalColor = Math.random() < 0.5 ? "white" : "black";
-      setSelectedColor(finalColor); // Actualiza la selección para reflejar el resultado
+      setSelectedColor(finalColor); 
     }
 
     setGameStarted(true);
@@ -51,11 +52,14 @@ const Juego = () => {
         </div>
             
         
-          <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
-          <EvaluationBar
+        <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
+          {showEvaluationBar && (
+            <EvaluationBar
               evaluation={boardEvaluation}
               playerColor={selectedColor === "black" ? "black" : "white"}
             />
+          )}
+
           <div className="all-data">
             <div className="board-header">
               <div><span className="username">Oponente </span></div>
@@ -88,6 +92,8 @@ const Juego = () => {
             setSelectedColor={setSelectedColor}
             setDifficulty={setDifficulty} 
             moveHistory={moveHistory}
+            showEvaluationBar={showEvaluationBar}
+            setShowEvaluationBar={setShowEvaluationBar}
             />
         </div>
 

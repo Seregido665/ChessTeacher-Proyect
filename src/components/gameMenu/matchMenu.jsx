@@ -8,6 +8,8 @@ export default function MatchMenu({
   selectedColor,
   setSelectedColor,
   moveHistory = [], 
+  showEvaluationBar,
+  setShowEvaluationBar,
 }) {
   
   const [difficulty, setDifficulty] = useState(3);
@@ -20,7 +22,7 @@ export default function MatchMenu({
       {/*----------------*/}
       {!gameStarted ? (
         <>
-          <div className="text-center mt-5 mb-2">
+          <div className="text-center mt-5 mb-3">
             <button
               onClick={onStartGame}
               className="matchButton inicio"
@@ -44,6 +46,16 @@ export default function MatchMenu({
                 onClick={() => setSelectedColor("black")}
               />
             </div>
+          </div>
+
+          <div className="form-check text-start mb-3 mt-4">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={showEvaluationBar}
+              onChange={(e) => setShowEvaluationBar(e.target.checked)}
+            />
+            <label>Barra de ventaja</label>
           </div>
 
           <div className="subMenu mb-4">

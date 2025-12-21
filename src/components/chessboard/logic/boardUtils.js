@@ -13,7 +13,7 @@ export function toAlgebraicNotation(board, move, piece) {
 
   const pieceLetter = {
     pawn: "",
-    night: "N",
+    knight: "N",
     bishop: "B",
     rook: "R",
     queen: "Q",

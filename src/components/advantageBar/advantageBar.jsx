@@ -1,7 +1,7 @@
 import "./advantageBar.css";
 
-const EvaluationBar = ({ evaluation, playerColor = "white" }) => {
-  // Evaluación positiva = ventaja para blancas
+const EvaluationBar = ({ evaluation, playerColor = "white" }) => {    
+                                    // CON playerColor DETERMINAMOS EL COLOR PARA LUEGO LA ORIENTACION
   const clampedEval = Math.max(-2000, Math.min(2000, evaluation));
 
   const whiteAdvantagePercentage = 50 + (clampedEval / 2000) * 50;

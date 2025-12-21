@@ -12,13 +12,14 @@ export function getLegalMoves(row, col, board, color, lastMove = null, castling 
   const legalMoves = [];
   const opponent = color === 'white' ? 'black' : 'white';
   const pseudoMoves = getPseudoLegalMoves(row, col, board, lastMove);
-  const castlingCopy = { ...castling };
+
 
   // -- REVISA TODOS LOS getPseudoLegalMoves --
   for (const move of pseudoMoves) {
+    const castlingTemp = { ...castling };
     const backup = makeTempMove(
       board,
-      castlingCopy,
+      castlingTemp,
       row,
       col,
       move.row,
@@ -28,14 +29,14 @@ export function getLegalMoves(row, col, board, color, lastMove = null, castling 
     if (!isInCheck(board, color)) {
       legalMoves.push(move);
     }
-    undoTempMove(board, castlingCopy, row, col, move.row, move.col, backup);
+    undoTempMove(board, castlingTemp, row, col, move.row, move.col, backup);
   }
 
   // -- REVISA SI REALIZAR UN POSIBLE ENROQUE FUESE POSIBLE --
-  if (piece.type === 'king' && !castling[color + 'KingMoved']) {
+   if (piece.type === 'king' && !castling[color + 'KingMoved']) {
     const backRank = color === 'white' ? 7 : 0;
 
-    // - ENROQUE CORTO -
+    // ENROQUE CORTO
     if (
       col === 4 &&
       !castling[color + 'RookKingsideMoved'] &&
@@ -47,7 +48,8 @@ export function getLegalMoves(row, col, board, color, lastMove = null, castling 
     ) {
       legalMoves.push({ row: backRank, col: 6, castling: 'kingside' });
     }
-    // - ENROQUE LARGO -
+
+    // ENROQUE LARGO
     if (
       col === 4 &&
       !castling[color + 'RookQueensideMoved'] &&
@@ -60,6 +62,7 @@ export function getLegalMoves(row, col, board, color, lastMove = null, castling 
       legalMoves.push({ row: backRank, col: 2, castling: 'queenside' });
     }
   }
+
   return legalMoves;
 }
 
@@ -70,7 +73,7 @@ export const getPseudoLegalMoves = (row, col, board, lastMove = null) => {
 
   switch (piece.type) {
     case 'pawn':   return getPawnPseudoMoves(row, col, piece.color, board, lastMove);
-    case 'night': return getKnightPseudoMoves(row, col, piece.color, board);
+    case 'knight': return getKnightPseudoMoves(row, col, piece.color, board);
     case 'rook':   return getRookPseudoMoves(row, col, piece.color, board);
     case 'bishop': return getBishopPseudoMoves(row, col, piece.color, board);
     case 'queen':  return getQueenPseudoMoves(row, col, piece.color, board);
