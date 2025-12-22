@@ -10,9 +10,69 @@ export default function MatchMenu({
   moveHistory = [], 
   showEvaluationBar,
   setShowEvaluationBar,
+  gameResult,               // ← Necesario para saber el resultado final
+  setDifficulty,            // ← Ya lo pasabas antes, lo mantenemos
 }) {
   
-  const [difficulty, setDifficulty] = useState(3);
+  const [difficulty, setDifficultyLocal] = useState(3);
+
+  // Si usas el difficulty del padre (recomendado), usa setDifficulty del prop
+  const handleDifficultyChange = (e) => {
+    const value = Number(e.target.value);
+    setDifficultyLocal(value);
+    if (setDifficulty) setDifficulty(value);
+  };
+
+  // Función para generar y descargar el PGN
+  const exportPGN = () => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+    let pgn = `[Event "Partida casual"]\n`;
+    pgn += `[Site "Tu app de ajedrez"]\n`;
+    pgn += `[Date "${dateStr}"]\n`;
+    pgn += `[White "${selectedColor === 'white' ? 'Seregido665' : 'Engine'}"]\n`;
+    pgn += `[Black "${selectedColor === 'black' ? 'Seregido665' : 'Engine'}"]\n`;
+
+    // Determinamos el resultado
+    let result = "*"; // por defecto: partida en curso (aunque no debería pasar)
+    if (gameResult) {
+      if (gameResult.includes("Victoria")) {
+        const ganadorBlancas = gameResult.includes("BLANCAS");
+        result = selectedColor === 'white' 
+          ? (ganadorBlancas ? "1-0" : "0-1")
+          : (ganadorBlancas ? "0-1" : "1-0");
+      } else {
+        // Tablas por cualquier motivo
+        result = "1/2-1/2";
+      }
+    }
+
+    pgn += `[Result "${result}"]\n\n`;
+
+    // Movimientos numerados
+    for (let i = 0; i < moveHistory.length; i += 2) {
+      const moveNum = Math.floor(i / 2) + 1;
+      const whiteMove = moveHistory[i] || "";
+      const blackMove = moveHistory[i + 1] || "";
+      pgn += `${moveNum}. ${whiteMove}`;
+      if (blackMove) pgn += ` ${blackMove}`;
+      pgn += " ";
+    }
+
+    pgn += result;
+
+    // Descarga del archivo
+    const blob = new Blob([pgn], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `partida_${dateStr}.pgn`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="match-menu-container">
@@ -63,7 +123,7 @@ export default function MatchMenu({
             <select
               className="form-select bg-dark text-white border-secondary"
               value={difficulty}
-              onChange={(e) => setDifficulty(Number(e.target.value))}
+              onChange={handleDifficultyChange}
             >
               <option value={1}>Nivel 1 ( 800 - 1000 )</option>
               <option value={2}>Nivel 2 ( 1000 - 1200 )</option>
@@ -80,7 +140,7 @@ export default function MatchMenu({
           {/*----------------*/}
           {/* --- MODO 2 --- */}
           {/*----------------*/}
-          <h5 className="text-center mb-1">Historial</h5>
+          <h5 className="text-center mb-2">Historial</h5>
           <div className="move-history mb-5">
             <div className="move-table">
               <div className="table-header">
@@ -90,17 +150,22 @@ export default function MatchMenu({
               </div>
 
               {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
-                  <div key={i} className="table-row">
-                    <div className="move-number">{i + 1}.</div>
-                    <div className="move-white">{moveHistory[i * 2] || ""}</div>
-                    <div className="move-black">{moveHistory[i * 2 + 1] || ""}</div>
-                  </div>
-                ))
-              }
+                <div key={i} className="table-row">
+                  <div className="move-number">{i + 1}.</div>
+                  <div className="move-white">{moveHistory[i * 2] || ""}</div>
+                  <div className="move-black">{moveHistory[i * 2 + 1] || ""}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-          
+          {/* Botón de exportar PGN - justo antes de Rendirse */}
+          <div className="text-center mb-3">
+            <button onClick={exportPGN} className="">
+              Exportar partida (PGN)
+            </button>
+          </div>
+
           <div className="text-center">
             <button
               onClick={onResetGame}

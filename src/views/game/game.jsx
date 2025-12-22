@@ -15,6 +15,7 @@ const Juego = () => {
   const [moveHistory, setMoveHistory] = useState([]);
   const [boardEvaluation, setBoardEvaluation] = useState(0);
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
+  const [gameResult, setGameResult] = useState(null);
 
   
 
@@ -94,6 +95,7 @@ const Juego = () => {
             moveHistory={moveHistory}
             showEvaluationBar={showEvaluationBar}
             setShowEvaluationBar={setShowEvaluationBar}
+            gameResult={gameResult}
             />
         </div>
 

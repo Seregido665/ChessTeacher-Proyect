@@ -1,50 +1,3 @@
-export function toAlgebraicNotation(board, move, piece) {
-  const files = ['a','b','c','d','e','f','g','h'];
-
-  // -- COORDENADAS --
-  const from = `${files[move.fromCol]}${8 - move.fromRow}`;
-  const to   = `${files[move.toCol]}${8 - move.toRow}`;
-
-  // -- ENROQUES --
-  if (piece.type === "king") {
-    if (move.fromCol === 4 && move.toCol === 6) return "O-O";
-    if (move.fromCol === 4 && move.toCol === 2) return "O-O-O";
-  }
-
-  const pieceLetter = {
-    pawn: "",
-    knight: "N",
-    bishop: "B",
-    rook: "R",
-    queen: "Q",
-    king: "K"
-  }[piece.type];
-
-  const destinationPiece = board[move.toRow][move.toCol];
-
-  const isCapture = !!destinationPiece;
-
-  // -- PEÓN CAPTURANDO --
-  let algebraic = "";
-
-  if (piece.type === "pawn") {
-    if (isCapture) algebraic = `${from[0]}x${to}`;
-    else algebraic = to;
-  } else {
-    algebraic = pieceLetter;
-    if (isCapture) algebraic += "x";
-    algebraic += to;
-  }
-
-  // -- CORONACIÓN --
-  if (move.moveData?.promotion) {
-    algebraic += "=" + move.moveData.promotion.toUpperCase();
-  }
-
-  return algebraic;
-}
-
-
 // ------ MAKE / UNDO TEMP MOVE ------
 // --- GUARDA LOS DATOS DEL ULTIMO MOVIMIENTO REALIZADO ---
 export const makeTempMove = (board, castling, fromRow, fromCol, toRow, toCol, enPassant = false) => {
@@ -121,4 +74,3 @@ export const undoTempMove = (board, castling, fromRow, fromCol, toRow, toCol, ba
 
   Object.assign(castling, backup.castlingBefore);
 };
-

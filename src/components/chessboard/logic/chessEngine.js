@@ -1,7 +1,10 @@
+// chessEngine.js
+
 import { useState } from 'react';
 import { hasLegalMoves, isInCheck } from './checks';
 import { getLegalMoves } from './legalMoves';
 import { evaluateBoard } from './chessAI';
+import { toAlgebraicNotation } from './notation';
 
 // --- CREA EL TABLERO INICIAL ---
 const createInitialBoard = () => {
@@ -153,31 +156,59 @@ export default function useChessEngine() {
 
   // --- MOVER PIEZA (HUMANO O IA) ---
   const movePiece = (fromRow, fromCol, toRow, toCol, moveData = {}, isAI = false) => {
-    if (gameOver) return;
+    if (gameOver) return null;
     const piece = board[fromRow][fromCol];
+
+    let promotedTo = null;
 
     if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
       if (isAI) {
-        const promotedTo = autoPromotionForAI(board, toRow, toCol, piece.color);
-        executeMove(fromRow, fromCol, toRow, toCol, moveData, null, promotedTo);
+        promotedTo = autoPromotionForAI(board, toRow, toCol, piece.color);
       } else {
         setPromotionData({ fromRow, fromCol, toRow, toCol, pieceColor: piece.color, enPassant: !!moveData.enPassant });
+        return null;
       }
-      return;
     }
 
-    executeMove(fromRow, fromCol, toRow, toCol, moveData);
+    executeMove(fromRow, fromCol, toRow, toCol, moveData, null, promotedTo);
+
+    const moveInfo = {
+      fromRow: fromRow,
+      fromCol: fromCol,
+      toRow: toRow,
+      toCol: toCol,
+      from: { row: fromRow, col: fromCol },
+      to: { row: toRow, col: toCol },
+      moveData: { promotion: promotedTo }
+    };
+    const pieceMoved = { type: piece.type, color: piece.color };
+    if (promotedTo) pieceMoved.type = promotedTo;
+
+    return toAlgebraicNotation(board, moveInfo, pieceMoved);
   };
 
   // --- PROMOCIÓN MANUAL ---
   const handlePromotion = (type) => {
-    if (!promotionData || gameOver) return;
+    if (!promotionData || gameOver) return null;
     const { fromRow, fromCol, toRow, toCol, enPassant } = promotionData;
     executeMove(fromRow, fromCol, toRow, toCol, { enPassant }, null, type);
     setPromotionData(null);
+
+    const moveInfo = {
+      fromRow: fromRow,
+      fromCol: fromCol,
+      toRow: toRow,
+      toCol: toCol,
+      from: { row: fromRow, col: fromCol },
+      to: { row: toRow, col: toCol },
+      moveData: { promotion: type }
+    };
+    const promotedPiece = { type: type, color: promotionData.pieceColor };
+
+    return toAlgebraicNotation(board, moveInfo, promotedPiece);
   };
 
-  const resetGame = (playerColor = 'white') => {
+  const resetGame = () => {
     setBoard(createInitialBoard());
     setCurrentTurn('white');
     setLastMove(null);

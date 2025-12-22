@@ -1,9 +1,10 @@
+// board.jsx
+
 import { useState, useEffect, useCallback } from 'react';
 import Square from './Square';
 import PromotionSelector from "../promotion/promotion";
 import useChessEngine from './logic/chessEngine';
 import { getBestMove, getLegalMovesForAI, executeMoveCopy, evaluateBoard } from './logic/chessAI';
-import { toAlgebraicNotation } from './logic/boardUtils';
 import './board.css';
 
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -33,21 +34,13 @@ export default function Chessboard({ onMove, gameStarted, playerColor, aiThinkin
       setTimeout(() => {
         const bestMove = getBestMove(board, aiColor, aiDepth, (r, c, b) => getLegalMovesForAI(r, c, b, lastMove, castlingRights), executeMoveCopy);
         if (bestMove) {
-          movePiece(bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol, bestMove.moveData, true);
-
-          const piece = board[bestMove.fromRow][bestMove.fromCol];
-          const algebraic = toAlgebraicNotation(board, {
-            fromRow: bestMove.fromRow, fromCol: bestMove.fromCol,
-            toRow: bestMove.toRow, toCol: bestMove.toCol,
-            ...bestMove
-          }, piece);
-
-          if (onMove) onMove(algebraic);
+          const notation = movePiece(bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol, bestMove.moveData, true);
+          if (notation && onMove) onMove(notation);
         }
         setAiThinking(false);
       }, 1000);
     }
-  }, [currentTurn, gameStarted, board, promotionData, aiThinking, lastMove, castlingRights, movePiece, playerColor, aiDepth]);
+  }, [currentTurn, gameStarted, board, promotionData, aiThinking, lastMove, castlingRights, movePiece, playerColor, aiDepth, onMove]);
 
   // --- CLICK EN CASILLAS ---
   const handleSquareClick = (row, col) => {
@@ -72,7 +65,10 @@ export default function Chessboard({ onMove, gameStarted, playerColor, aiThinkin
     }
 
     const validMove = legalMoves.find(m => m.row === actualRow && m.col === actualCol);
-    if (validMove) movePiece(fromRow, fromCol, actualRow, actualCol, validMove);
+    if (validMove) {
+      const notation = movePiece(fromRow, fromCol, actualRow, actualCol, validMove);
+      if (notation && onMove) onMove(notation);
+    }
 
     if (piece && piece.color === playerColor) {
       setSelectedSquare({ row: actualRow, col: actualCol });
@@ -103,6 +99,11 @@ export default function Chessboard({ onMove, gameStarted, playerColor, aiThinkin
 
   const displayedBoard = playerColor === 'white' ? board : board.map(r => [...r].reverse()).reverse();
 
+  const handlePromotionSelect = (type) => {
+    const notation = handlePromotion(type);
+    if (notation && onMove) onMove(notation);
+  };
+
   return (
     <div className="chessboard">
       {displayedBoard.map((row, rowIndex) => (
@@ -114,7 +115,7 @@ export default function Chessboard({ onMove, gameStarted, playerColor, aiThinkin
         </div>
       ))}
 
-      {promotionData && <PromotionSelector color={promotionData.pieceColor} onSelect={handlePromotion} />}
+      {promotionData && <PromotionSelector color={promotionData.pieceColor} onSelect={handlePromotionSelect} />}
     </div>
   );
 }
