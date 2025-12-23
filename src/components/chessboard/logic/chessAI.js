@@ -1,4 +1,5 @@
 import { getLegalMoves } from './legalMoves';
+import { isInCheck } from './checks';
 
 
 // --- CODIGO NECESARIO PARA EL FUNCIONAMIENTO DEL ALGORITMO "MINIMAX CON PODA ALFA-BETA" ---
@@ -65,43 +66,61 @@ export function evaluateBoard(board) {
   return totalEvaluation;
 }
 
+
 function minimax(board, depth, alpha, beta, isMaximizingPlayer, getLegalMovesForAI, executeMoveCopy) {
   if (depth === 0) {
     return evaluateBoard(board);
   }
 
-  const allMoves = getAllPossibleMoves(board, isMaximizingPlayer ? 'white' : 'black', getLegalMovesForAI);
-  
-  if (allMoves.length === 0) {
-    return isMaximizingPlayer ? -999999 : 999999;
+  const color = isMaximizingPlayer ? 'white' : 'black';
+  const moves = getAllPossibleMoves(board, color, getLegalMovesForAI);
+
+  if (moves.length === 0) {
+    const inCheck = isInCheck(board, color);
+    if (inCheck) {
+      return isMaximizingPlayer ? -100000 : 100000; // JAQUE MATE
+    } else {
+      return 0; // AHOGADO
+    }
   }
 
   if (isMaximizingPlayer) {
-    let maxEval = -999999;
-    
-    for (const move of allMoves) {
-      const newBoard = executeMoveCopy(board, move.fromRow, move.fromCol, move.toRow, move.toCol, move.moveData);
+    let maxEval = -Infinity;
+    for (const move of moves) {
+      const newBoard = executeMoveCopy(
+        board,
+        move.fromRow,
+        move.fromCol,
+        move.toRow,
+        move.toCol,
+        move.moveData
+      );
       const evalScore = minimax(newBoard, depth - 1, alpha, beta, false, getLegalMovesForAI, executeMoveCopy);
       maxEval = Math.max(maxEval, evalScore);
       alpha = Math.max(alpha, evalScore);
-      
-      if (beta <= alpha) break; // Poda alfa-beta
+      if (beta <= alpha) break;
     }
     return maxEval;
   } else {
-    let minEval = 999999;
-    
-    for (const move of allMoves) {
-      const newBoard = executeMoveCopy(board, move.fromRow, move.fromCol, move.toRow, move.toCol, move.moveData);
+    let minEval = Infinity;
+    for (const move of moves) {
+      const newBoard = executeMoveCopy(
+        board,
+        move.fromRow,
+        move.fromCol,
+        move.toRow,
+        move.toCol,
+        move.moveData
+      );
       const evalScore = minimax(newBoard, depth - 1, alpha, beta, true, getLegalMovesForAI, executeMoveCopy);
       minEval = Math.min(minEval, evalScore);
       beta = Math.min(beta, evalScore);
-      
-      if (beta <= alpha) break; // Poda alfa-beta
+      if (beta <= alpha) break;
     }
     return minEval;
   }
 }
+
 
 function getAllPossibleMoves(board, color, getLegalMovesForAI) {
   const moves = [];

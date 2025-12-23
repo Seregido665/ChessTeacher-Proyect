@@ -75,13 +75,13 @@
 }
 
 .rendirse {
-  background: #b00000; /* Rojo oscuro */
+  background: #b3b600a6; /* Rojo oscuro */
   color: white;
   flex: 1;
 }
 
 .rendirse:hover {
-  background: #d40000;
+  background: #d4c600b7;
 }
 
 

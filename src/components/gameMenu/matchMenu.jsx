@@ -171,7 +171,7 @@ export default function MatchMenu({
               onClick={onResetGame}
               className="matchButton rendirse"
             >
-              Rendirse
+              Reiniciar
             </button>
           </div>
         </>

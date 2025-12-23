@@ -21,25 +21,18 @@ const Juego = () => {
 
   const handleStart = () => {
     let finalColor = selectedColor;
-
-      // Elegir aleatoriamente entre 'white' y 'black'
     if (selectedColor === "gradient") {
       finalColor = Math.random() < 0.5 ? "white" : "black";
       setSelectedColor(finalColor); 
     }
-
     setGameStarted(true);
   };
 
   const handleReset = () => {
-    // Determina quién ganó
-    const winner = selectedColor === "black" ? "BLANCAS" : "NEGRAS";
-    alert(`Te has rendido. ¡${winner} ganan!`);
-
     setGameStarted(false);
     setAiThinking(false);
     setMoveHistory([]);
-    setResetKey(prev => prev + 1); // FUERZA UN RESET COMPLETO DEL TABLERO.
+    setResetKey(prev => prev + 1); 
   };
 
   return (

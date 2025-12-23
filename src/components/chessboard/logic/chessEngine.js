@@ -1,69 +1,45 @@
-// chessEngine.js
-
+// useChessEngine.js
 import { useState } from 'react';
-import { hasLegalMoves, isInCheck } from './checks';
-import { getLegalMoves } from './legalMoves';
-import { evaluateBoard } from './chessAI';
-import { toAlgebraicNotation } from './notation';
+import {
+  createInitialBoard,
+  getPositionKey,
+  isInsufficientMaterial,
+  hasLegalMoves,
+  isInCheck,
+  getLegalMoves,
+  toAlgebraicNotation,
+  evaluateBoard // ← Importamos evaluateBoard aquí
+} from './rules';
 
-// --- CREA EL TABLERO INICIAL ---
-const createInitialBoard = () => {
-  const board = Array(8).fill(null).map(() => Array(8).fill(null));
-  const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
-  board[0] = backRow.map(type => ({ type, color: 'black' }));
-  board[1] = Array(8).fill({ type: 'pawn', color: 'black' });
-  board[6] = Array(8).fill({ type: 'pawn', color: 'white' });
-  board[7] = backRow.map(type => ({ type, color: 'white' }));
-  return board;
-};
+// --- PROMOCIÓN AUTOMÁTICA PARA LA IA (la movemos aquí porque necesita evaluateBoard) ---
+const autoPromotionForAI = (board, toRow, toCol, color) => {
+  const options = ['queen', 'rook', 'bishop', 'knight'];
+  let bestValue = color === 'white' ? -Infinity : Infinity;
+  let bestPiece = 'queen';
 
-const PIECE_KEY = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', king: 'K' };
-
-// --- FUNCION AUXILIAR PARA LA CLAVE DE POSICIÓN ---
-const getPositionKey = (board, currentTurn, castlingRights, lastMove) => {
-  const boardStr = board.map(row => row.map(piece => piece ? `${piece.color[0]}${PIECE_KEY[piece.type]}` : '-').join(',')).join('|');
-  const castlingStr = Object.values(castlingRights).join(',');
-  const enPassantStr = lastMove && lastMove.enPassant ? `${lastMove.to.row},${lastMove.to.col}` : '-';
-  return `${boardStr}|${currentTurn}|${castlingStr}|${enPassantStr}`;
-};
-
-// --- COMPRUEBA MATERIAL INSUFICIENTE ---
-const isInsufficientMaterial = (board) => {
-  let whitePieces = 0, blackPieces = 0;
-  let whiteKnights = 0, blackKnights = 0;
-  let whiteBishops = 0, blackBishops = 0;
-  let hasPawnQueenRook = false;
-
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      const piece = board[r][c];
-      if (!piece || piece.type === 'king') continue;
-      if (piece.type === 'pawn' || piece.type === 'queen' || piece.type === 'rook') hasPawnQueenRook = true;
-      if (piece.color === 'white') {
-        whitePieces++; if (piece.type === 'knight') whiteKnights++; if (piece.type === 'bishop') whiteBishops++;
-      } else {
-        blackPieces++; if (piece.type === 'knight') blackKnights++; if (piece.type === 'bishop') blackBishops++;
-      }
+  for (const pieceType of options) {
+    const testBoard = board.map(r => r.map(p => p ? { ...p } : null));
+    testBoard[toRow][toCol] = { type: pieceType, color };
+    const value = evaluateBoard(testBoard);
+    if (color === 'white' ? value > bestValue : value < bestValue) {
+      bestValue = value;
+      bestPiece = pieceType;
     }
   }
-
-  if (hasPawnQueenRook) return false;
-  if (whitePieces === 0 && blackPieces === 0) return true;
-  if (whitePieces === 0 && (blackKnights === 1 && blackBishops === 0 || blackKnights === 0 && blackBishops === 1)) return true;
-  if (blackPieces === 0 && (whiteKnights === 1 && whiteBishops === 0 || whiteKnights === 0 && whiteBishops === 1)) return true;
-  if (whitePieces + blackPieces <= 2 && whiteKnights + blackKnights + whiteBishops + blackBishops === whitePieces + blackPieces) return true;
-  return false;
+  return bestPiece;
 };
 
-// ---------- HOOK PRINCIPAL ----------
 export default function useChessEngine() {
   const [board, setBoard] = useState(createInitialBoard());
   const [currentTurn, setCurrentTurn] = useState('white');
   const [lastMove, setLastMove] = useState(null);
   const [castlingRights, setCastlingRights] = useState({
-    whiteKingMoved: false, blackKingMoved: false,
-    whiteRookKingsideMoved: false, whiteRookQueensideMoved: false,
-    blackRookKingsideMoved: false, blackRookQueensideMoved: false
+    whiteKingMoved: false,
+    blackKingMoved: false,
+    whiteRookKingsideMoved: false,
+    whiteRookQueensideMoved: false,
+    blackRookKingsideMoved: false,
+    blackRookQueensideMoved: false
   });
   const [promotionData, setPromotionData] = useState(null);
   const [halfMoveCounter, setHalfMoveCounter] = useState(0);
@@ -93,13 +69,24 @@ export default function useChessEngine() {
     // ENROQUES
     if (moveData.castling) {
       const row = piece.color === 'white' ? 7 : 0;
-      if (moveData.castling === 'kingside') { newBoard[row][5] = newBoard[row][7]; newBoard[row][7] = null; }
-      if (moveData.castling === 'queenside') { newBoard[row][3] = newBoard[row][0]; newBoard[row][0] = null; }
+      if (moveData.castling === 'kingside') {
+        newBoard[row][5] = newBoard[row][7];
+        newBoard[row][7] = null;
+      }
+      if (moveData.castling === 'queenside') {
+        newBoard[row][3] = newBoard[row][0];
+        newBoard[row][0] = null;
+      }
     }
 
     // ACTUALIZA DERECHOS DE ENROQUE
     if (piece.type === 'king') {
-      setCastlingRights(prev => ({ ...prev, [piece.color + 'KingMoved']: true, [piece.color + 'RookKingsideMoved']: true, [piece.color + 'RookQueensideMoved']: true }));
+      setCastlingRights(prev => ({
+        ...prev,
+        [piece.color + 'KingMoved']: true,
+        [piece.color + 'RookKingsideMoved']: true,
+        [piece.color + 'RookQueensideMoved']: true
+      }));
     }
     if (piece.type === 'rook' && (fromCol === 0 || fromCol === 7)) {
       const side = fromCol === 7 ? 'RookKingsideMoved' : 'RookQueensideMoved';
@@ -129,29 +116,38 @@ export default function useChessEngine() {
     const hasMoves = hasLegalMoves(newBoard, nextPlayer, lastMove, castlingRights);
 
     if (!hasMoves) {
-      if (kingInCheck) { alert(`¡JAQUE MATE! Ganaron las ${piece.color === 'white' ? 'BLANCAS' : 'NEGRAS'}`); setGameOver(true); setGameResult(`Victoria para las ${piece.color === 'white' ? 'BLANCAS' : 'NEGRAS'}`); return; }
-      else { alert("¡TABLAS por ahogado!"); setGameOver(true); setGameResult("Tablas por ahogado"); return; }
-    }
-    if (newHalfMoveCounter >= 100) { alert("¡TABLAS por regla de 50 movimientos!"); setGameOver(true); setGameResult("Tablas por regla de 50 movimientos"); return; }
-    if (count >= 3) { alert("¡TABLAS por repetición!"); setGameOver(true); setGameResult("Tablas por repetición"); return; }
-    if (isInsufficientMaterial(newBoard)) { alert("¡TABLAS por material insuficiente!"); setGameOver(true); setGameResult("Tablas por material insuficiente"); return; }
-  };
-
-  // --- DETERMINA LA PIEZA DE PROMOCIÓN AUTOMÁTICA PARA IA ---
-  const autoPromotionForAI = (board, toRow, toCol, color) => {
-    const options = ['queen', 'rook', 'bishop', 'knight'];
-    let bestValue = color === 'white' ? -Infinity : Infinity;
-    let bestPiece = 'queen';
-    for (const piece of options) {
-      const testBoard = board.map(r => r.map(p => p ? { ...p } : null));
-      testBoard[toRow][toCol] = { type: piece, color };
-      const value = evaluateBoard(testBoard);
-      if (color === 'white' ? value > bestValue : value < bestValue) {
-        bestValue = value;
-        bestPiece = piece;
+      if (kingInCheck) {
+        alert(`¡JAQUE MATE! Ganaron las ${piece.color === 'white' ? 'BLANCAS' : 'NEGRAS'}`);
+        setGameOver(true);
+        setGameResult(`Victoria para las ${piece.color === 'white' ? 'BLANCAS' : 'NEGRAS'}`);
+      } else {
+        alert("¡TABLAS por ahogado!");
+        setGameOver(true);
+        setGameResult("Tablas por ahogado");
       }
+      return;
     }
-    return bestPiece;
+
+    if (newHalfMoveCounter >= 100) {
+      alert("¡TABLAS por regla de 50 movimientos!");
+      setGameOver(true);
+      setGameResult("Tablas por regla de 50 movimientos");
+      return;
+    }
+
+    if (count >= 3) {
+      alert("¡TABLAS por repetición!");
+      setGameOver(true);
+      setGameResult("Tablas por repetición");
+      return;
+    }
+
+    if (isInsufficientMaterial(newBoard)) {
+      alert("¡TABLAS por material insuficiente!");
+      setGameOver(true);
+      setGameResult("Tablas por material insuficiente");
+      return;
+    }
   };
 
   // --- MOVER PIEZA (HUMANO O IA) ---
@@ -173,10 +169,10 @@ export default function useChessEngine() {
     executeMove(fromRow, fromCol, toRow, toCol, moveData, null, promotedTo);
 
     const moveInfo = {
-      fromRow: fromRow,
-      fromCol: fromCol,
-      toRow: toRow,
-      toCol: toCol,
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
       from: { row: fromRow, col: fromCol },
       to: { row: toRow, col: toCol },
       moveData: { promotion: promotedTo }
@@ -191,19 +187,20 @@ export default function useChessEngine() {
   const handlePromotion = (type) => {
     if (!promotionData || gameOver) return null;
     const { fromRow, fromCol, toRow, toCol, enPassant } = promotionData;
+
     executeMove(fromRow, fromCol, toRow, toCol, { enPassant }, null, type);
     setPromotionData(null);
 
     const moveInfo = {
-      fromRow: fromRow,
-      fromCol: fromCol,
-      toRow: toRow,
-      toCol: toCol,
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
       from: { row: fromRow, col: fromCol },
       to: { row: toRow, col: toCol },
       moveData: { promotion: type }
     };
-    const promotedPiece = { type: type, color: promotionData.pieceColor };
+    const promotedPiece = { type, color: promotionData.pieceColor };
 
     return toAlgebraicNotation(board, moveInfo, promotedPiece);
   };
@@ -213,9 +210,12 @@ export default function useChessEngine() {
     setCurrentTurn('white');
     setLastMove(null);
     setCastlingRights({
-      whiteKingMoved: false, blackKingMoved: false,
-      whiteRookKingsideMoved: false, whiteRookQueensideMoved: false,
-      blackRookKingsideMoved: false, blackRookQueensideMoved: false
+      whiteKingMoved: false,
+      blackKingMoved: false,
+      whiteRookKingsideMoved: false,
+      whiteRookQueensideMoved: false,
+      blackRookKingsideMoved: false,
+      blackRookQueensideMoved: false
     });
     setPromotionData(null);
     setHalfMoveCounter(0);
