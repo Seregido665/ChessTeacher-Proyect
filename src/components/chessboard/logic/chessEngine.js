@@ -6,10 +6,10 @@ import {
   isInsufficientMaterial,
   hasLegalMoves,
   isInCheck,
-  getLegalMoves,
   toAlgebraicNotation,
   evaluateBoard // ← Importamos evaluateBoard aquí
 } from './rules';
+import { getLegalMoves } from './legalMoves';
 
 // --- PROMOCIÓN AUTOMÁTICA PARA LA IA (la movemos aquí porque necesita evaluateBoard) ---
 const autoPromotionForAI = (board, toRow, toCol, color) => {

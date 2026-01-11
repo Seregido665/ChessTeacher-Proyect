@@ -1,5 +1,5 @@
 // boardInteractions.js
-import { getLegalMoves } from './chessEngine'; // Asegúrate de que la ruta sea correcta
+import { getLegalMoves } from './legalMoves'; // Asegúrate de que la ruta sea correcta
 
 export const createInteractionHandlers = ({ gameStarted, aiThinking, promotionData, playerColor, board, movePiece,
   selectedSquare, setSelectedSquare, legalMoves, setLegalMoves, draggedSquare, setDraggedSquare, onMove }) => {
