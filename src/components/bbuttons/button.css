@@ -8,9 +8,9 @@
     cursor: pointer;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
-    width: 360px;   /* ancho fijo */
+    width: 320px;   /* ancho fijo */
+    margin: 5px 40px 30px 40px;
     padding: 10px 20px; /* opcional: altura y relleno del botón */
-    margin-bottom: 20px;
 }
 
 .verde {

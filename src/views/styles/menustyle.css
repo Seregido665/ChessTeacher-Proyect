@@ -46,13 +46,16 @@
 
 .titulo {
   color: white;
-  font-size: 25px;
+  font-size: 22px;
 }
 .subtitulo {
   color: white;
 }
+form {
+  width: 400px; /* o el ancho que te guste */
+}
 input {
-  width: 75%;
+  width: 68%;
 }
 .marco {
   background-color: #cccccc13;
