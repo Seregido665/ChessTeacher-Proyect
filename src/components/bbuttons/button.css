@@ -4,12 +4,11 @@
     font-weight: 500;
     border: none;
     border-radius: 8px;
-    padding: 14px 60px;
     cursor: pointer;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
-    width: 320px;   /* ancho fijo */
-    margin: 5px 40px 30px 40px;
+    width: 320px;   
+    margin: 6px 30px 10px 40px;
     padding: 10px 20px; /* opcional: altura y relleno del botón */
 }
 
@@ -48,10 +47,11 @@
 
 .enPlay {
   padding: 3px;
-  margin: 10px 0px 0px 20px;
+  margin: 10px 0px 0px 0px;
   border-radius: 40px;
+  letter-spacing: 0.5px;
   display: grid;
   font-size: 17px;
   flex-direction: column;    /* centra horizontalmente */
-  width: 80%;  
+  width: 180px;  
 }

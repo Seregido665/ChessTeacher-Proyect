@@ -41,7 +41,8 @@
 .intro {
   color: antiquewhite;
   font-style: italic;
-  font-size: 28px;
+  font-size: 22px;
+  letter-spacing: 2px;
 }
 
 .titulo {
@@ -66,8 +67,8 @@ input {
   background: none;         
   border: none;                
   color: white;             
-  text-decoration: underline;   
-  padding: 8px 16px;            
+  margin-top: 15px;
+  text-decoration: underline;              
   transition: all 0.2s ease;      /* Transición suave */
 }
 

@@ -27,7 +27,6 @@ const Registrarse = () => {
     e.preventDefault();
 
     const newErrors = {};
-
     if (!registerData.name) {newErrors.name = { message: "Falta el nombre." };}
     if (!registerData.email) {newErrors.email = { message: "Falta el email." };}
     if (!registerData.password) {newErrors.password = { message: "Falta la contraseña." };}
@@ -52,7 +51,7 @@ const Registrarse = () => {
     registerUser(registerData)
         .then(() => {
         setErrors({});
-        navigate('/game');
+        navigate('/inicioSesion');
         })
         .catch(err => {
         setErrors(err.response?.data?.errors || {});
@@ -83,7 +82,7 @@ const Registrarse = () => {
                                     {errors.name && (<div className="text-danger">{errors.name.message}</div>)}
                          
                                     <input
-                                        className="mt-4"
+                                        className="mt-2"
                                         name="email"
                                         value={registerData.email}
                                         onChange={handleChange}
@@ -92,7 +91,7 @@ const Registrarse = () => {
                                     {errors.email && (<div className="text-danger">{errors.email.message}</div>)}
 
                                     <input
-                                        className="mt-4"
+                                        className="mt-2"
                                         type="password"
                                         name="password"
                                         value={registerData.password}
@@ -102,7 +101,7 @@ const Registrarse = () => {
                                     {errors.password && (<div className="text-danger">{errors.password.message}</div>)}
                                     
                                     <input
-                                        className="mt-4"
+                                        className="mt-2"
                                         type="password"
                                         name="passwordConfirm"
                                         value={registerData.passwordConfirm}
@@ -110,15 +109,15 @@ const Registrarse = () => {
                                         placeholder="Confirmar contraseña"
                                     />
                                     {errors.passwordConfirm && (<div className="text-danger">{errors.passwordConfirm.message}</div>)}
-                                <div className="pt-4">
-                                <Button
-                                    size="large"
-                                    type="submit"
-                                    text="REGISTRARSE"
-                                    color="verde"
-                                    action={() => console.log('Botón presionado')}
-                                />
-                                </div>
+                                    <div className="pt-4">
+                                        <Button
+                                            size="large"
+                                            type="submit"
+                                            text="REGISTRARSE"
+                                            color="verde"
+                                            action={() => console.log('Botón presionado')}
+                                        />
+                                    </div>
                                 </form>
                             </section>
                            

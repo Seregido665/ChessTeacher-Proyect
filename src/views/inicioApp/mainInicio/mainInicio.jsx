@@ -16,10 +16,10 @@ const Inicio = () => {
                   <div>
                     <img className="imgLogo" src="./../img/logoChessW.png"/>    
                   </div>
-                  <div className="pb-5 pt-3">
+                  <div className="pb-3 pt-3">
                     <p className="intro">
                       Bienvenido a tu entrenador <br />
-                      personal de ajedrez.
+                      de ajedrez.
                     </p>
                   </div>
                   <div>
@@ -29,7 +29,6 @@ const Inicio = () => {
                       color="verde"
                       action={() => navigate("/registrarse" )}
                     />
-                    </div><div>
                     <Button
                       type="primary"
                       text="INICIAR SESIÓN"
@@ -37,7 +36,7 @@ const Inicio = () => {
                       action={() => navigate("/inicioSesion" )}
                     />
                   </div>
-                  <div className="pt-2">
+                  <div>
                       <button 
                         className="simple" 
                         onClick={() => navigate("/game")}>

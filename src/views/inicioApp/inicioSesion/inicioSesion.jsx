@@ -1,10 +1,65 @@
 import "../../styles/menustyle.css";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { loginUser } from "../../../services/user.service";
 import Button from '../../../components/bbuttons/button'
 
 
 const Sesion = () => {
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
+    const [loginData, setFormData] = useState({
+      email: '',
+      password: ''
+    })
+
+    const handleChange = (e) => {
+    const { name, value } = e.target
+        setFormData(prev => ({
+        ...prev,
+        [name]: value
+        }))
+    }
+
+const handleLogin = (e) => {
+  e.preventDefault();
+
+  const newErrors = {};
+  if (!loginData.email) { newErrors.email = { message: "Falta el email." }; }
+  if (!loginData.password) { newErrors.password = { message: "Falta la contraseña." }; }
+
+  const emailRegex = /^[\w.-]+@[\w.-]+\.\w{2,3}$/;
+  if (loginData.email && !emailRegex.test(loginData.email)) {
+    newErrors.email = { message: "Estructura incorrecta" };
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  loginUser(loginData)
+    .then((response) => {
+      localStorage.setItem('authUser', JSON.stringify(response.data.user));
+      setErrors({});
+      console.log("LOGUEADO");
+      navigate('/game');
+    })
+    .catch((err) => {
+      console.log('ERROR EN EL LOGIN:', err);
+      
+      // Capturamos el mensaje del backend
+      const serverMessage = err.response?.data?.message;
+
+      if (serverMessage === "El usuario no existe") {
+        setErrors({ email: { message: serverMessage } });
+      } else if (serverMessage === "Contraseña incorrecta") {
+        setErrors({ password: { message: serverMessage } });
+      } else {
+        setErrors({ general: { message: serverMessage || "Error al conectar" } });
+      }
+    });
+};
 
     return (
         <div className="fondo img-fondo1">
@@ -18,23 +73,36 @@ const Sesion = () => {
                             </div>
                             <section className="marco">
                                 <h1 className="titulo pt-4 pb-2">Iniciar Sesión.</h1>
-                                <form action="/inicioSesion" class="formul" method="post">
-                                    <label htmlFor="nombre" className="subtitulo">Nombre de usuario:</label><br />
-                                    <input type="text" id="nombre" name="nombre" required /><br /><br />
-
-                                    <label htmlFor="password" className="subtitulo">Contraseña:</label><br />
-                                    <input type="password" id="password" name="password" required /><br /><br />
+                                <form onSubmit={handleLogin} className="formul">
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        value={loginData.email}
+                                        onChange={handleChange}
+                                        placeholder="Email"
+                                    />
+                                    {errors.email && (<div className="text-danger">{errors.email.message}</div>)}
+                                    <input
+                                        className="mt-2"
+                                        type="password"
+                                        name="password"
+                                        value={loginData.password}
+                                        onChange={handleChange}
+                                        placeholder="Password"
+                                    />
+                                    {errors.password && (<div className="text-danger">{errors.password.message}</div>)}
+                                    <div className="pt-4">
+                                        <Button
+                                            size="large"
+                                            type="submit"
+                                            text="INICIAR SESIÓN"
+                                            color="azul"
+                                            action={() => console.log('Botón presionado')}
+                                        />
+                                    </div>
                                 </form>
                             </section>
-                            <div className="pt-4">
-                                <Button
-                                    size="large"
-                                    type="primary"
-                                    text="INICIAR SESIÓN"
-                                    color="azul"
-                                    //action={() => console.log('Botón presionado')}
-                                />
-                            </div>
+                            
                             <div className="pt-2">
                                 <button 
                                     className="simple" 
