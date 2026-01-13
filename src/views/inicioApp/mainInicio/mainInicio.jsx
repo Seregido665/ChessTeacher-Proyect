@@ -40,7 +40,7 @@ const Inicio = () => {
                       <button 
                         className="simple" 
                         onClick={() => navigate("/game")}>
-                          Probar juego.
+                          Jugar.
                       </button>
                   </div>
                 </section>

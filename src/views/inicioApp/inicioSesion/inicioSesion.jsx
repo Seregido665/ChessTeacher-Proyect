@@ -1,17 +1,25 @@
 import "../../styles/menustyle.css";
-import { useState } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from "../../../services/user.service";
+import AuthContext from "../../../context/userContext"
 import Button from '../../../components/bbuttons/button'
 
 
 const Sesion = () => {
     const navigate = useNavigate();
+    const { userLogin } = useContext(AuthContext)
     const [errors, setErrors] = useState({});
     const [loginData, setFormData] = useState({
       email: '',
       password: ''
     })
+
+    useEffect(() => {
+        if (localStorage.getItem('user')) {
+            navigate('/game');
+        }
+    }, [navigate]);     // EJECUTA useEffect CUANDO navigate CAMBIE
 
     const handleChange = (e) => {
     const { name, value } = e.target
@@ -39,18 +47,18 @@ const handleLogin = (e) => {
   }
 
   loginUser(loginData)
-    .then((response) => {
-      localStorage.setItem('authUser', JSON.stringify(response.data.user));
+    .then((user) => {
+      //localStorage.setItem('authUser', JSON.stringify(response.data.user));
+      console.log(user)
       setErrors({});
+      userLogin(user)
       console.log("LOGUEADO");
       navigate('/game');
     })
     .catch((err) => {
       console.log('ERROR EN EL LOGIN:', err);
       
-      // Capturamos el mensaje del backend
       const serverMessage = err.response?.data?.message;
-
       if (serverMessage === "El usuario no existe") {
         setErrors({ email: { message: serverMessage } });
       } else if (serverMessage === "Contraseña incorrecta") {

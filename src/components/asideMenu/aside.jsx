@@ -8,11 +8,10 @@ import { useState } from 'react'; // ← Añadido para leer localStorage reactiv
 
 export default function AsideMenu() {
   const navigate = useNavigate();
-  
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authUser'));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('user'));  // !! PARA CONVERTIRLO EN BOOLEANO
   
   const handleLogout = () => {
-    localStorage.removeItem('authUser');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
     navigate("/mainInicio"); 
   };
