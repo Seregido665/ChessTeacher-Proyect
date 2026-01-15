@@ -4,7 +4,7 @@ import "../../views/styles/menustyle.css";
 import { useNavigate } from "react-router-dom";
 import { ButtonLeft, ButtonLeftExit } from '../bbuttons/buttonSideMenu';
 import Button from '../bbuttons/button';
-import { useState } from 'react'; // ← Añadido para leer localStorage reactivamente
+import { useState } from 'react'; 
 
 export default function AsideMenu() {
   const navigate = useNavigate();

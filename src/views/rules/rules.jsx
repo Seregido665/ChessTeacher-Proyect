@@ -1,5 +1,4 @@
 import "../styles/menustyle.css";
-import "../../components/chessboard/board.css";
 //import Chessboard from '../../components/chessboard/board';
 import AsideMenu from '../../components/asideMenu/aside';
 

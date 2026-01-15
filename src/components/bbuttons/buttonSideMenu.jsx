@@ -1,5 +1,3 @@
-// ButtonLeft.jsx
-
 export const ButtonLeft = ({ text, action, img, type, typeExit }) => {
   return (
     <div>

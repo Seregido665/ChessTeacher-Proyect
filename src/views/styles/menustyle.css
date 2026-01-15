@@ -81,3 +81,35 @@ input {
   background-color: black;
   border-radius: 6px;
 }
+
+
+
+
+
+
+.board-header, .board-footer {
+  height: 50px;
+  width: 100%;                
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: rgba(236, 236, 236, 0.068);
+  color: #fff;
+  border-radius: 5px;
+}
+
+.username {
+  font-size: 22px;
+}
+.tiempo {
+  font-size: 1.3rem;         
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgb(0, 0, 0);
+}
+
+
+
+

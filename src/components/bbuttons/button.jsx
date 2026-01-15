@@ -11,7 +11,4 @@ const Button = ({ type, text, action ,color }) => {
   )
 }
 
-export default Button
-
-
-//<img className="imgLogo" src="./img/logoChessW.png"/>    
+export default Button  
