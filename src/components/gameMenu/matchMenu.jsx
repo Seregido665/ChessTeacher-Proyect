@@ -30,7 +30,7 @@ export default function MatchMenu({
       {/*----------------*/}
       {!gameStarted ? (
         <>
-          <div className="text-center mt-5 mb-3">
+          <div className="text-center mt-3 mb-1">
             <button
               onClick={onStartGame}
               className="matchButton inicio"
@@ -39,7 +39,7 @@ export default function MatchMenu({
             </button>
           </div>
 
-          <div className="mb-3">
+          <div className="mb-1">
             <div className="color-selector">
               <button
                 className={`colorButton white ${selectedColor === "white" ? "selected" : ""}`}
@@ -56,7 +56,7 @@ export default function MatchMenu({
             </div>
           </div>
 
-          <div className="form-check text-start mb-3 mt-4">
+          <div className="form-check text-start mb-2 mt-4">
             <input
               className="form-check-input"
               type="checkbox"
@@ -67,20 +67,23 @@ export default function MatchMenu({
           </div>
 
           <div className="subMenu mb-4">
-            <label className="form-label fw-bold mb-1">Dificultad</label>
-            <select
-              className="form-select bg-dark text-white border-secondary"
-              value={difficulty}
-              onChange={handleDifficultyChange}
-            >
-              <option value={1}>Nivel 1 ( 800 - 1000 )</option>
-              <option value={2}>Nivel 2 ( 1000 - 1200 )</option>
-              <option value={3}>Nivel 3 ( 1200 - 1400 )</option>
-              <option value={4}>Nivel 4 ( 1400 - 1600 )</option>
-              <option value={5}>Nivel 5 ( 1600 - 1800 )</option>
-              <option value={6}>Nivel 6 ( 1800 - 2000 )</option>
-              <option value={7}>Nivel 7 ( +2000 )</option>
-            </select>
+            <label className="form-label fw-bold mb-1">Dificultad del Motor</label>
+          <select
+            className="form-select bg-dark text-white border-secondary"
+            value={difficulty}
+            onChange={handleDifficultyChange}
+          >
+            <option value={0}>Nivel 0 (200 - 500)</option>
+            <option value={1}>Nivel 1 (500 - 800)</option>
+            <option value={2}>Nivel 2 (800 - 1000)</option>
+            <option value={3}>Nivel 3 (1000 - 1200)</option>
+            <option value={4}>Nivel 4 (1200 - 1500)</option>
+            <option value={5}>Nivel 5 (1500 - 1800)</option>
+            <option value={6}>Nivel 6 (1800 - 2000)</option>
+            <option value={7}>Nivel 7 (2000 - 2200)</option>
+            <option value={8}>Nivel 8 (2200 - 2400)</option>
+            <option value={9}>Nivel 9 (2400+)</option>
+          </select>
           </div>
         </>
       ) : (
@@ -107,12 +110,13 @@ export default function MatchMenu({
             </div>
           </div>
 
-          {/* Botón de exportar PGN - justo antes de Rendirse */}
+          {/* Botón de exportar PGN - justo antes de Rendirse 
           <div className="text-center mb-3">
             <button className="">
               Exportar partida (PGN)
             </button>
           </div>
+          */}
 
           <div className="text-center">
             <button

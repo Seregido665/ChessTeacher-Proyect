@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 
@@ -7,138 +7,158 @@ const ChessGame = ({
   selectedColor,
   resetKey,
   onMoveHistory,
-  onEvaluation
+  onEvaluation,
+  difficulty 
 }) => {
   const [game, setGame] = useState(new Chess());
   const [boardOrientation, setBoardOrientation] = useState('white');
+  const [isThinking, setIsThinking] = useState(false);
+  const stockfish = useRef(null);
 
-  // Reiniciar juego cuando cambia resetKey
+  // 1. INICIALIZACIÓN Y PROTOCOLO UCI
   useEffect(() => {
-    const newGame = new Chess();
-    setGame(newGame);
-    if (onMoveHistory) onMoveHistory([]);
-    if (onEvaluation) onEvaluation(0);
-    console.log('🔄 Juego reiniciado');
-  }, [resetKey]);
+    const worker = new Worker('/stockfish.js');
+    stockfish.current = worker;
 
-  // Cambiar orientación del tablero según el color seleccionado
-  useEffect(() => {
-    if (gameStarted) {
-      setBoardOrientation(selectedColor === 'black' ? 'black' : 'white');
-      console.log('🎨 Orientación del tablero:', selectedColor);
-    }
-  }, [gameStarted, selectedColor]);
+    // Configuración inicial del motor
+    worker.postMessage('uci');
+    worker.postMessage('isready');
 
-  // Función principal para manejar movimientos
-  function onDrop(sourceSquare, targetSquare) {
-    console.log('🎯 Intento de movimiento:', sourceSquare, '→', targetSquare);
-    
-    // Verificar si el juego ha comenzado
-    if (!gameStarted) {
-      console.log('❌ El juego no ha comenzado');
-      return false;
-    }
+    worker.onmessage = (e) => {
+      const line = e.data;
+      console.log('Stockfish dice:', line); // <-- Mira tu consola (F12)
 
-    // Verificar si es el turno del jugador
-    const currentTurn = game.turn();
-    const isPlayerTurn = 
-      (selectedColor === 'white' && currentTurn === 'w') ||
-      (selectedColor === 'black' && currentTurn === 'b');
-
-    console.log('📊 Estado del juego:', {
-      turnoActual: currentTurn === 'w' ? 'Blancas' : 'Negras',
-      colorJugador: selectedColor,
-      esTurnoJugador: isPlayerTurn
-    });
-
-    if (!isPlayerTurn) {
-      console.log('❌ No es tu turno');
-      return false;
-    }
-
-    // Intentar hacer el movimiento
-    try {
-      const move = game.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: 'q' // Promoción automática a reina
-      });
-
-      // Si move es null, el movimiento es ilegal
-      if (move === null) {
-        console.log('❌ Movimiento ilegal según las reglas del ajedrez');
-        return false;
-      }
-
-      console.log('✅ Movimiento VÁLIDO:', move.san);
-
-      // Actualizar el estado con una nueva instancia
-      setGame(new Chess(game.fen()));
-
-      // Actualizar historial
-      if (onMoveHistory) {
-        const history = game.history();
-        console.log('📋 Historial:', history);
-        onMoveHistory(history);
-      }
-
-      // Actualizar evaluación
-      if (onEvaluation) {
-        const evaluation = evaluateBoard(game);
-        console.log('📊 Evaluación:', evaluation);
-        onEvaluation(evaluation);
-      }
-
-      // Verificar si hay jaque mate o tablas
-      if (game.isGameOver()) {
-        if (game.isCheckmate()) {
-          const winner = game.turn() === 'w' ? 'Negras' : 'Blancas';
-          console.log('👑 ¡JAQUE MATE! Ganan las', winner);
-          alert(`¡JAQUE MATE! Ganan las ${winner}`);
-        } else if (game.isDraw()) {
-          console.log('🤝 ¡TABLAS!');
-          alert('¡TABLAS!');
+      if (line.includes('bestmove')) {
+        const moveStr = line.split(' ')[1];
+        if (moveStr && moveStr !== '(none)') {
+          applyMove(moveStr);
+          setIsThinking(false);
         }
-      } else if (game.isCheck()) {
-        console.log('⚠️ ¡JAQUE!');
       }
 
-      return true;
-
-    } catch (error) {
-      console.error('💥 Error al intentar mover:', error);
-      return false;
-    }
-  }
-
-  // Función de evaluación (material)
-  function evaluateBoard(chess) {
-    const pieceValues = {
-      p: 1,   // peón
-      n: 3,   // caballo
-      b: 3,   // alfil
-      r: 5,   // torre
-      q: 9,   // reina
-      k: 0    // rey
+      if (line.includes('score cp')) {
+        const parts = line.split(' ');
+        const cp = parseInt(parts[parts.indexOf('cp') + 1]);
+        const evaluation = (game.turn() === 'w' ? cp : -cp) / 100;
+        if (onEvaluation) onEvaluation(evaluation);
+      }
     };
 
-    let evaluation = 0;
-    const board = chess.board();
+    return () => {
+      worker.terminate();
+      stockfish.current = null;
+    };
+  }, []);
 
-    board.forEach(row => {
-      row.forEach(square => {
-        if (square) {
-          const value = pieceValues[square.type];
-          evaluation += square.color === 'w' ? value : -value;
+  // 2. REINICIO
+  useEffect(() => {
+    setGame(new Chess());
+    setIsThinking(false);
+    if (onMoveHistory) onMoveHistory([]);
+    if (onEvaluation) onEvaluation(0);
+    if (stockfish.current) {
+      stockfish.current.postMessage('ucinewgame');
+      stockfish.current.postMessage('isready');
+    }
+  }, [resetKey]);
+
+  useEffect(() => {
+    setBoardOrientation(selectedColor === 'black' ? 'black' : 'white');
+  }, [selectedColor]);
+
+  // 3. FUNCIÓN PARA APLICAR MOVIMIENTOS
+  const applyMove = useCallback((moveData) => {
+    setGame((prevGame) => {
+      const newGame = new Chess(prevGame.fen());
+      try {
+        const move = typeof moveData === 'string'
+          ? newGame.move({ from: moveData.substring(0, 2), to: moveData.substring(2, 4), promotion: 'q' })
+          : newGame.move(moveData);
+
+        if (move) {
+          if (onMoveHistory) onMoveHistory(newGame.history());
+          return newGame;
         }
-      });
+      } catch (e) {
+        console.error("Error al mover:", e);
+      }
+      return prevGame;
+    });
+  }, [onMoveHistory]);
+
+  // 4. DISPARADOR DE IA (EFECTO CORREGIDO)
+useEffect(() => {
+  if (!gameStarted || game.isGameOver() || isThinking) return;
+
+  const turn = game.turn();
+  const isAiTurn = (selectedColor === 'white' && turn === 'b') || 
+                   (selectedColor === 'black' && turn === 'w');
+
+  // ... dentro del useEffect de la IA en ChessGame.jsx
+
+// ... dentro del useEffect de la IA en ChessGame.jsx
+
+// ... dentro del useEffect de la IA en ChessGame.jsx
+
+if (isAiTurn && stockfish.current && !isThinking) {
+  setIsThinking(true);
+  
+  // Mapeo equilibrado de 10 niveles (0 al 9)
+  const levels = {
+    // PRINCIPIANTES (Uso de movetime para limitar visión táctica)
+    0: { skill: 0,  depth: 1, movetime: 10 },  // Regala piezas constantemente
+    1: { skill: 1,  depth: 1, movetime: 50 },  // Comete errores graves
+    2: { skill: 3,  depth: 1, movetime: 150 }, // Ve amenazas directas de 1 jugada
+    3: { skill: 5,  depth: 2 },                // Juega con lógica básica
+
+    // INTERMEDIOS (Uso de profundidad moderada)
+    4: { skill: 8,  depth: 4 },                // Empieza a usar estrategia
+    5: { skill: 12, depth: 6 },                // No se deja piezas gratis
+    6: { skill: 15, depth: 8 },                // Calcula combinaciones cortas
+
+    // ALTOS (Máximo nivel de habilidad, profundidad competitiva)
+    7: { skill: 18, depth: 10 },               // Nivel experto
+    8: { skill: 20, depth: 12 },               // Muy sólido
+    9: { skill: 20, depth: 15 }                // Prácticamente imbatible
+  };
+
+  const config = levels[difficulty] || levels[3];
+
+  // 1. Configurar Skill Level (0-20)
+  stockfish.current.postMessage(`setoption name Skill Level value ${config.skill}`);
+  
+  // 2. Cargar posición FEN
+  stockfish.current.postMessage(`position fen ${game.fen()}`);
+  
+  // 3. Lanzar cálculo
+  if (config.movetime) {
+    stockfish.current.postMessage(`go movetime ${config.movetime}`);
+  } else {
+    stockfish.current.postMessage(`go depth ${config.depth}`);
+  }
+}
+}, [game, gameStarted, selectedColor, difficulty, isThinking]);
+
+  // 5. SOLTADO DE PIEZA (HUMANO)
+  function onDrop(sourceSquare, targetSquare) {
+    if (!gameStarted || isThinking) return false;
+
+    // Validar turno humano
+    const isPlayerTurn = (selectedColor === 'white' && game.turn() === 'w') || 
+                         (selectedColor === 'black' && game.turn() === 'b');
+    if (!isPlayerTurn) return false;
+
+    const move = applyMove({
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: 'q',
     });
 
-    return evaluation;
+    return move !== null;
   }
 
   return (
-    <div style={{ width: '500px', maxWidth: '600px' }}>
+    <div style={{ width: '500px', maxWidth: '100%' }}>
       <Chessboard 
         position={game.fen()} 
         onPieceDrop={onDrop}
