@@ -4,8 +4,12 @@ import MatchMenu from '../../components/gameMenu/matchMenu';
 import EvaluationBar from '../../components/advantageBar/advantageBar';
 import ChessGame from '../../components/chessboard/ChessGame'; 
 import { useState, useEffect } from 'react';
+import { useContext } from "react";
+import AuthContext from "../../context/userContext";
 
 const Juego = () => {
+  const { user } = useContext(AuthContext);
+
   const [gameStarted, setGameStarted] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -16,6 +20,7 @@ const Juego = () => {
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
   const gameResult = useState(null);
 
+  console.log("Usuario", user)
   // 🔥 DEBUG: Monitorear historial
   useEffect(() => {
     console.log("📊 HISTORIAL EN PADRE:", moveHistory);
@@ -66,7 +71,6 @@ const Juego = () => {
           <div className="all-data">
             <div className="board-header">
               <span className="username">Oponente </span>
-              <div className="right"><span id="top-timer" className="tiempo">00:00</span></div>
             </div>
             
             {/* TABLERO DE AJEDREZ */}
@@ -80,7 +84,7 @@ const Juego = () => {
             />
             
             <div className="board-footer">
-              <span className="username">Seregido665</span>
+              <span className="username"> {user?.data?.user?.name || "Invitado"} </span>
               <div className="right"><span id="bottom-timer" className="tiempo">00:00</span></div>
             </div>
           </div>

@@ -4,17 +4,19 @@ import "../../views/styles/menustyle.css";
 import { useNavigate } from "react-router-dom";
 import { ButtonLeft, ButtonLeftExit } from '../bbuttons/buttonSideMenu';
 import Button from '../bbuttons/button';
-import { useState } from 'react'; 
+import { useContext } from 'react'; 
+import AuthContext from "../../context/userContext";
 
 export default function AsideMenu() {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('user'));  // !! PARA CONVERTIRLO EN BOOLEANO
+
+  const { user, logout } = useContext(AuthContext);
+  const isLoggedIn = !!user;
   
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    navigate("/mainInicio"); 
-  };
+  logout();
+  navigate("/mainInicio");
+};
   return (
     <div className="menuLateral">
       <div className="logo-container">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import Result from "../resultado/result";
 
 const ChessGame = ({
   gameStarted,
@@ -16,7 +17,20 @@ const ChessGame = ({
   const [boardWidth, setBoardWidth] = useState(400);
 
   const stockfish = useRef(null);
-  const moveHistoryRef = useRef([]); // Ref para mantener historial en tiempo real
+  const moveHistoryRef = useRef([]); 
+
+  const getGameResultMessage = () => {
+  if (game.isCheckmate()) {
+    return game.turn() === "w"
+      ? "Negras GANAN"
+      : "Blancas GANAN";
+  }
+  if (game.isStalemate()) return "🤝 TABLAS por ahogado";
+  if (game.isThreefoldRepetition()) return "🤝 TABLAS por repetición";
+  if (game.isInsufficientMaterial()) return "🤝 TABLAS por material insuficiente";
+  if (game.isDraw()) return "🤝 TABLAS";
+};
+
 
   // Mantener actualizado el color
   useEffect(() => {
@@ -178,16 +192,27 @@ const ChessGame = ({
   }
 
   return (
-    <Chessboard
-      boardWidth={boardWidth}
-      position={game.fen()}
-      onPieceDrop={onDrop}
-      boardOrientation={boardOrientation}
-      customBoardStyle={{
-        borderRadius: '4px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
-      }}
-    />
+    <div style={{ position: "relative" }}>
+      <Chessboard
+        boardWidth={boardWidth}
+        position={game.fen()}
+        onPieceDrop={onDrop}
+        boardOrientation={boardOrientation}
+        customBoardStyle={{
+          borderRadius: "4px",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
+        }}
+      />
+
+      <Result
+        isGameOver={game.isGameOver()}
+        result={getGameResultMessage()}
+        onRestart={() => {
+          if (typeof resetKey === "function") resetKey();
+        }}
+      />
+    </div>
+
   );
 };
 
