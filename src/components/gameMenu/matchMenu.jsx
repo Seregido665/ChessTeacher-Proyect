@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import "./matchMenu.css";
 
 export default function MatchMenu({
@@ -14,6 +14,7 @@ export default function MatchMenu({
 }) {
   
   const [difficulty, setDifficultyLocal] = useState(3);
+  const historyEndRef = useRef(null); // ← Ref al final del historial
 
   // Si usas el difficulty del padre (recomendado), usa setDifficulty del prop
   const handleDifficultyChange = (e) => {
@@ -21,6 +22,13 @@ export default function MatchMenu({
     setDifficultyLocal(value);
     if (setDifficulty) setDifficulty(value);
   };
+
+   // Scroll automático al final
+  useEffect(() => {
+    if (historyEndRef.current) {
+      historyEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [moveHistory]); // Se ejecuta cada vez que cambia el historial
 
   return (
     <div className="match-menu-container">
@@ -107,16 +115,9 @@ export default function MatchMenu({
                   <div className="move-black">{moveHistory[i * 2 + 1] || ""}</div>
                 </div>
               ))}
+              <div ref={historyEndRef}></div>
             </div>
           </div>
-
-          {/* Botón de exportar PGN - justo antes de Rendirse 
-          <div className="text-center mb-3">
-            <button className="">
-              Exportar partida (PGN)
-            </button>
-          </div>
-          */}
 
           <div className="text-center">
             <button

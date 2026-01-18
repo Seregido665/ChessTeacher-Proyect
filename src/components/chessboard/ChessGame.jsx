@@ -16,11 +16,10 @@ const ChessGame = ({
   const [boardWidth, setBoardWidth] = useState(400);
 
   const stockfish = useRef(null);
-  const selectedColorRef = useRef(selectedColor);
+  const moveHistoryRef = useRef([]); // Ref para mantener historial en tiempo real
 
-  // Mantener actualizado el ref del color seleccionado
+  // Mantener actualizado el color
   useEffect(() => {
-    selectedColorRef.current = selectedColor;
     setBoardOrientation(selectedColor === 'black' ? 'black' : 'white');
   }, [selectedColor]);
 
@@ -37,25 +36,30 @@ const ChessGame = ({
     return () => window.removeEventListener('resize', updateBoardSize);
   }, []);
 
-  // FUNCION PARA APLICAR MOVIMIENTOS
-  const applyMove = useCallback((moveData) => {
-    setGame((prevGame) => {
-      const newGame = new Chess(prevGame.fen());
-      try {
-        const move = typeof moveData === 'string'
-          ? newGame.move({ from: moveData.substring(0, 2), to: moveData.substring(2, 4), promotion: 'q' })
-          : newGame.move(moveData);
+  // 🔥 NUEVA: Función centralizada para hacer movimientos
+  const makeMove = useCallback((moveData) => {
+    try {
+        const moveResult = game.move(moveData); // usa la instancia actual
 
-        if (move) {
-          if (onMoveHistory) onMoveHistory(newGame.history());
-          return newGame;
+        if (moveResult) {
+            console.log(`Movimiento realizado: ${moveResult.san}`);
+
+            // Actualizar estado del juego
+            setGame(new Chess(game.fen())); // actualizar para forzar re-render
+
+            // Actualizar historial del padre acumulando movimientos
+            if (onMoveHistory) {
+                onMoveHistory(prev => [...prev, moveResult.san]); // ✅ AÑADIR, no reemplazar
+            }
+
+            return true;
         }
-      } catch (e) {
-        console.error("Error al mover:", e);
-      }
-      return prevGame;
-    });
-  }, [onMoveHistory]);
+    } catch (error) {
+        console.error("Error al hacer movimiento:", error);
+    }
+    return false;
+}, [game, onMoveHistory]);
+
 
   // INICIALIZAR STOCKFISH
   useEffect(() => {
@@ -72,52 +76,60 @@ const ChessGame = ({
       if (line.includes('bestmove')) {
         const moveStr = line.split(' ')[1];
         if (moveStr && moveStr !== '(none)') {
-          applyMove(moveStr);
+          console.log("Stockfish sugiere:", moveStr);
+          makeMove(moveStr);
           setIsThinking(false);
         }
       }
 
       // Evaluación de posición
-     if (line.includes('score cp')) {
+      if (line.includes('score cp')) {
         const parts = line.split(' ');
         const cpIndex = parts.indexOf('cp') + 1;
         if (cpIndex > 0 && cpIndex < parts.length) {
           const cp = parseInt(parts[cpIndex], 10);
-
-          // ✅ Enviar directamente la evaluación tal como viene de Stockfish
           if (onEvaluation) onEvaluation(cp);
         }
       }
-
     };
 
     return () => {
       worker.terminate();
       stockfish.current = null;
     };
-  }, [applyMove, onEvaluation]); // Se monta solo una vez por React
+  }, [makeMove, onEvaluation]);
 
   // REINICIO DEL JUEGO
   useEffect(() => {
-    setGame(new Chess());
+    console.log("🔄 REINICIANDO JUEGO COMPLETO");
+    const newGame = new Chess();
+    setGame(newGame);
+    moveHistoryRef.current = [];
     setIsThinking(false);
-    if (onMoveHistory) onMoveHistory([]);
+    
+    if (onMoveHistory) {
+      onMoveHistory([]);
+    }
     if (onEvaluation) onEvaluation(0);
+    
     if (stockfish.current) {
       stockfish.current.postMessage('ucinewgame');
       stockfish.current.postMessage('isready');
     }
   }, [resetKey, onMoveHistory, onEvaluation]);
 
-  // TURNO IA
+  // TURNO IA - Simple y efectivo
   useEffect(() => {
-    if (!gameStarted || game.isGameOver() || isThinking) return;
+    if (!gameStarted || isThinking || game.isGameOver()) {
+      return;
+    }
 
     const turn = game.turn();
     const isAiTurn = (selectedColor === 'white' && turn === 'b') ||
                      (selectedColor === 'black' && turn === 'w');
 
     if (isAiTurn && stockfish.current) {
+      console.log("🤖 Es turno de la IA");
       setIsThinking(true);
 
       const levels = {
@@ -134,7 +146,7 @@ const ChessGame = ({
       };
 
       const config = levels[difficulty] || levels[3];
-
+      
       stockfish.current.postMessage(`setoption name Skill Level value ${config.skill}`);
       stockfish.current.postMessage(`position fen ${game.fen()}`);
       stockfish.current.postMessage(`go depth ${config.depth}`);
@@ -143,21 +155,26 @@ const ChessGame = ({
 
   // MOVIMIENTO HUMANO
   function onDrop(sourceSquare, targetSquare) {
-    if (!gameStarted || isThinking) return false;
+    if (!gameStarted || isThinking) {
+      console.log("❌ No se puede mover: juego no iniciado o IA pensando");
+      return false;
+    }
 
-    const isPlayerTurn =
-      (selectedColor === 'white' && game.turn() === 'w') ||
-      (selectedColor === 'black' && game.turn() === 'b');
+    const isPlayerTurn = (selectedColor === 'white' && game.turn() === 'w') ||
+                         (selectedColor === 'black' && game.turn() === 'b');
 
-    if (!isPlayerTurn) return false;
+    if (!isPlayerTurn) {
+      console.log("❌ No es turno del jugador");
+      return false;
+    }
 
-    applyMove({
+    console.log(`👤 Movimiento humano: ${sourceSquare} -> ${targetSquare}`);
+    
+    return makeMove({
       from: sourceSquare,
       to: targetSquare,
       promotion: 'q',
     });
-
-    return true;
   }
 
   return (

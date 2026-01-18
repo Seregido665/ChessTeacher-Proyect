@@ -3,7 +3,7 @@ import AsideMenu from '../../components/asideMenu/aside';
 import MatchMenu from '../../components/gameMenu/matchMenu';
 import EvaluationBar from '../../components/advantageBar/advantageBar';
 import ChessGame from '../../components/chessboard/ChessGame'; 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Juego = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -12,11 +12,17 @@ const Juego = () => {
   const [selectedColor, setSelectedColor] = useState("white");
   const [difficulty, setDifficulty] = useState(3);
   const [moveHistory, setMoveHistory] = useState([]);
-  const [boardEvaluation, setBoardEvaluation] = useState(0); // ← Faltaba
+  const [boardEvaluation, setBoardEvaluation] = useState(0);
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
   const gameResult = useState(null);
 
-  // Determinar color IA y evaluación desde el punto de vista de la IA
+  // 🔥 DEBUG: Monitorear historial
+  useEffect(() => {
+    console.log("📊 HISTORIAL EN PADRE:", moveHistory);
+    console.log(`📊 Total: ${moveHistory.length} movimientos`);
+  }, [moveHistory]);
+
+  // Determinar color IA
   const aiColor = selectedColor === "white" ? "black" : "white";
   const aiEvaluation = aiColor === "white" ? boardEvaluation : -boardEvaluation;
 
@@ -27,14 +33,16 @@ const Juego = () => {
       setSelectedColor(finalColor); 
     }
     setGameStarted(true);
+    console.log("🚀 Partida iniciada con color:", finalColor);
   };
 
   const handleReset = () => {
+    console.log("🔄 Reiniciando partida...");
     setGameStarted(false);
     setAiThinking(false);
     setMoveHistory([]);
-    setBoardEvaluation(0); // ← Resetear evaluación
-    setResetKey(prev => prev + 1); 
+    setBoardEvaluation(0);
+    setResetKey(prev => prev + 1);
   };
 
   return (
@@ -51,7 +59,7 @@ const Juego = () => {
           {showEvaluationBar && (
             <EvaluationBar
               evaluation={aiEvaluation}
-              playerColor={selectedColor} // Opcional, solo para CSS
+              playerColor={selectedColor}
             />
           )}
 
@@ -66,8 +74,8 @@ const Juego = () => {
               gameStarted={gameStarted}
               selectedColor={selectedColor}
               resetKey={resetKey}
-              onMoveHistory={setMoveHistory}
-              onEvaluation={setBoardEvaluation} // ← Muy importante para actualizar barra
+              onMoveHistory={setMoveHistory} // ✅ Directo y simple
+              onEvaluation={setBoardEvaluation}
               difficulty={difficulty}
             />
             
@@ -91,7 +99,7 @@ const Juego = () => {
             showEvaluationBar={showEvaluationBar}
             setShowEvaluationBar={setShowEvaluationBar}
             gameResult={gameResult}
-            />
+          />
         </div>
 
         <div className="col-xl-1"></div>
