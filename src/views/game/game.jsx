@@ -12,9 +12,13 @@ const Juego = () => {
   const [selectedColor, setSelectedColor] = useState("white");
   const [difficulty, setDifficulty] = useState(3);
   const [moveHistory, setMoveHistory] = useState([]);
-  const [boardEvaluation, setBoardEvaluation] = useState(0);
+  const [boardEvaluation, setBoardEvaluation] = useState(0); // ← Faltaba
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
   const gameResult = useState(null);
+
+  // Determinar color IA y evaluación desde el punto de vista de la IA
+  const aiColor = selectedColor === "white" ? "black" : "white";
+  const aiEvaluation = aiColor === "white" ? boardEvaluation : -boardEvaluation;
 
   const handleStart = () => {
     let finalColor = selectedColor;
@@ -43,18 +47,17 @@ const Juego = () => {
           </aside>
         </div>
             
-        
         <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
           {showEvaluationBar && (
             <EvaluationBar
-              evaluation={boardEvaluation}
-              playerColor={selectedColor === "black" ? "black" : "white"}
+              evaluation={aiEvaluation}
+              playerColor={selectedColor} // Opcional, solo para CSS
             />
           )}
 
           <div className="all-data">
             <div className="board-header">
-              <div><span className="username">Oponente </span></div>
+              <span className="username">Oponente </span>
               <div className="right"><span id="top-timer" className="tiempo">00:00</span></div>
             </div>
             
@@ -64,12 +67,12 @@ const Juego = () => {
               selectedColor={selectedColor}
               resetKey={resetKey}
               onMoveHistory={setMoveHistory}
-              onEvaluation={setBoardEvaluation}
+              onEvaluation={setBoardEvaluation} // ← Muy importante para actualizar barra
               difficulty={difficulty}
             />
             
             <div className="board-footer">
-              <div><span className="username">Seregido665</span></div>
+              <span className="username">Seregido665</span>
               <div className="right"><span id="bottom-timer" className="tiempo">00:00</span></div>
             </div>
           </div>
