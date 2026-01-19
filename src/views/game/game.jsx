@@ -3,7 +3,7 @@ import AsideMenu from '../../components/asideMenu/aside';
 import MatchMenu from '../../components/gameMenu/matchMenu';
 import EvaluationBar from '../../components/advantageBar/advantageBar';
 import ChessGame from '../../components/chessboard/ChessGame'; 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useContext } from "react";
 import AuthContext from "../../context/userContext";
 
@@ -11,7 +11,6 @@ const Juego = () => {
   const { user } = useContext(AuthContext);
 
   const [gameStarted, setGameStarted] = useState(false);
-  const [aiThinking, setAiThinking] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [selectedColor, setSelectedColor] = useState("white");
   const [difficulty, setDifficulty] = useState(3);
@@ -19,6 +18,9 @@ const Juego = () => {
   const [boardEvaluation, setBoardEvaluation] = useState(0);
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
   const [gameResult, setGameResult] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [increment, setIncrement] = useState(0);
+  const timerRef = useRef(null);
 
   const buildMatchData = () => {
     return {
@@ -53,15 +55,23 @@ const Juego = () => {
   const aiColor = selectedColor === "white" ? "black" : "white";
   const aiEvaluation = aiColor === "white" ? boardEvaluation : -boardEvaluation;
 
-  const handleStart = () => {
+  const handleStart = (timeControl) => {
     let finalColor = selectedColor;
+
     if (selectedColor === "gradient") {
       finalColor = Math.random() < 0.5 ? "white" : "black";
-      setSelectedColor(finalColor); 
+      setSelectedColor(finalColor);
     }
+
+    clearInterval(timerRef.current);      // 🔥 CLAVE
+    setTimeLeft(timeControl.base);
+    setIncrement(timeControl.increment);
     setGameStarted(true);
-    console.log("🚀 Partida iniciada con color:", finalColor);
+
+    startTimer();                          // 🔥 ARRANQUE LIMPIO
   };
+
+
 
   const handleGameEnd = (data) => {
     setGameResult(data);
@@ -69,13 +79,51 @@ const Juego = () => {
 
 
   const handleReset = () => {
-    console.log("🔄 Reiniciando partida...");
-    setGameStarted(false);
-    setAiThinking(false);
-    setMoveHistory([]);
-    setBoardEvaluation(0);
-    setResetKey(prev => prev + 1);
-  };
+  clearInterval(timerRef.current);
+  setTimeLeft(0);
+  setGameStarted(false);
+  setMoveHistory([]);
+  setBoardEvaluation(0);
+  setGameResult(null);
+  setResetKey(prev => prev + 1);
+};
+
+
+ const startTimer = () => {
+  clearInterval(timerRef.current);
+
+  timerRef.current = setInterval(() => {
+    setTimeLeft(prev => {
+      if (prev <= 1) {
+        clearInterval(timerRef.current);
+        handleGameEnd({
+          winner: selectedColor === "white" ? "black" : "white",
+          reason: "time",
+          finalFen: "timeout"
+        });
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+};
+
+useEffect(() => {
+  if (!gameStarted) return;
+  if (moveHistory.length === 0) return;
+
+  const lastMoveIndex = moveHistory.length - 1;
+
+  const playerMoved =
+    (selectedColor === "white" && lastMoveIndex % 2 === 0) ||
+    (selectedColor === "black" && lastMoveIndex % 2 === 1);
+
+  if (playerMoved) {
+    setTimeLeft(prev => prev + increment);
+  }
+}, [moveHistory, gameStarted, selectedColor, increment]);
+
+
 
   return (
     <div className="vh-100 d-flex img-fondo2">
@@ -95,7 +143,7 @@ const Juego = () => {
             />
           )}
 
-          <div className="all-data">
+          <div className="">
             <div className="board-header">
               <span className="username">Oponente </span>
             </div>
@@ -114,7 +162,12 @@ const Juego = () => {
             
             <div className="board-footer">
               <span className="username"> {user?.data?.user?.name || "Invitado"} </span>
-              <div className="right"><span id="bottom-timer" className="tiempo">00:00</span></div>
+              <div className="right">
+                <span className="tiempo">
+                  {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
+                  {String(timeLeft % 60).padStart(2, "0")}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -122,7 +175,6 @@ const Juego = () => {
         <div className="col-xl-3 col-md-3 col-12 d-flex align-items-center justify-content-center">
           <MatchMenu
             gameStarted={gameStarted}
-            aiThinking={aiThinking}
             onStartGame={handleStart}
             onResetGame={handleReset}       
             selectedColor={selectedColor}

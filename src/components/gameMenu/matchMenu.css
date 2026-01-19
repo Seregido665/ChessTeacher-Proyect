@@ -1,4 +1,4 @@
-/* Contenedor principal del menú */
+
 .match-menu-container {
   color: rgb(238, 238, 238);
   width: min(77vw, 77vh);
@@ -13,6 +13,7 @@
 .subMenu {
   padding: 5px 10px 10px 10px;
   background-color: #0000005d;
+  font-weight: bold;
 }
 
 /* Contenedor de los 3 botones de color */
@@ -23,9 +24,9 @@
 }
 
 .colorButton {
-  width: 30px;
+  width: 70px;
   height: 30px;
-  border-radius: 3px;
+  border-radius: 80px;
   cursor: pointer;
   border: 2px solid transparent;
 }
@@ -66,12 +67,20 @@
   font-size: 1.1rem;
   font-weight: bold;
   border: none;
-  border-radius: 4px;
+  border-radius: 1px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   padding: 8px 20px; /* opcional: altura y relleno del botón */
   margin-bottom: 25px;
-  
+}
+
+.saveButton {
+  width: 60%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .rendirse {
@@ -144,5 +153,18 @@
 
 .move-black {
   color: #cccccc;
+}
+
+.result {
+  margin-bottom: 0;
+  border-radius: 55px;
+  background-color: #00000052;
+  box-shadow: #ffffffd7 0px 0px 10px;
+}
+
+.result-text {
+  margin-bottom: 0;
+  font-size: 500px;
+  
 }
 

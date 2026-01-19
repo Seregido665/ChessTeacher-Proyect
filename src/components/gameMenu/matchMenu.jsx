@@ -21,6 +21,11 @@ export default function MatchMenu({
   const [localDifficulty, setLocalDifficulty] = useState(3);
   const [hasSaved, setHasSaved] = useState(false);
   const [isResigned, setIsResigned] = useState(false);
+  const [timeControl, setTimeControl] = useState({
+    base: 300,      // 5 minutos por defecto
+    increment: 0
+  });
+  const [timeIndex, setTimeIndex] = useState(5);
 
   const historyEndRef = useRef(null);
 
@@ -35,6 +40,28 @@ export default function MatchMenu({
     setDifficulty?.(value);
   };
 
+ const handleTimeChange = (e) => {
+  const value = Number(e.target.value);
+  setTimeIndex(value);
+
+  const options = [
+    { base: 60, increment: 0 },
+    { base: 60, increment: 1 },
+    { base: 120, increment: 1 },
+    { base: 180, increment: 0 },
+    { base: 180, increment: 2 },
+    { base: 300, increment: 0 },
+    { base: 300, increment: 3 },
+    { base: 600, increment: 0 },
+    { base: 600, increment: 5 },
+    { base: 900, increment: 10 },
+  ];
+
+  setTimeControl(options[value]);
+};
+
+
+
   // Scroll automático solo cuando estamos en modo partida activa
   useEffect(() => {
     if (historyEndRef.current && isGameActive) {
@@ -46,19 +73,15 @@ export default function MatchMenu({
   const getResultText = () => {
     if (gameResult) {
       if (gameResult.reason === "checkmate") {
-        return gameResult.winner === "white" ? "¡Blancas ganan!" : "¡Negras ganan!";
+        return gameResult.winner === "white" ? "¡Blancas GANAN!" : "¡Negras GANAN!";
       }
       if (gameResult.reason === "resignation") {
         const winnerColor = gameResult.winner === "white" ? "Blancas" : "Negras";
-        return `¡${winnerColor} ganan! (abandono)`;
+        return `¡${winnerColor} GANAN!`;
       }
       return "Tablas";
     }
 
-    if (isResigned) {
-      const winner = selectedColor === "white" ? "Negras" : "Blancas";
-      return `¡${winner} ganan! (abandono)`;
-    }
 
     return "";
   };
@@ -88,11 +111,20 @@ export default function MatchMenu({
   };
 
   // Reiniciar estados para nueva partida
+  // Reiniciar estados para nueva partida
   const handleNewGame = () => {
+    // Resetear estados locales
     setHasSaved(false);
     setIsResigned(false);
-    onResetGame?.();      // si quieres resetear todo desde el padre
-    onStartGame?.();      // o solo iniciar de nuevo
+    
+    // Importante: llamar a la función del padre que reinicia TODO
+    if (showResult) {
+      // Si venimos de una partida terminada → reinicio completo
+      onResetGame?.();     // Esta función debe existir en Juego.jsx
+    }
+    
+    // Iniciar la nueva partida
+    onStartGame?.(timeControl);
   };
 
   return (
@@ -100,7 +132,6 @@ export default function MatchMenu({
 
       {isGameActive ? (
         // ── Modo PARTIDA EN CURSO ──
-        // Solo historial + botón rendirse
         <>
           <h5 className="text-center mb-3">Historial de movimientos</h5>
 
@@ -137,16 +168,7 @@ export default function MatchMenu({
       ) : (
         // ── Modo CONFIGURACIÓN ── (antes de empezar o después de terminar)
         <>
-          {/* Mostrar resultado si la partida ya terminó */}
-          {showResult && (
-            <div className="result-section text-center mb-4">
-              <h2 className="result-text mb-3">
-                {getResultText()}
-              </h2>
-            </div>
-          )}
-
-          <div className="text-center mt-3 mb-4">
+          <div className="text-center mt-2">
             <button
               onClick={handleNewGame}
               className="matchButton inicio"
@@ -175,7 +197,7 @@ export default function MatchMenu({
             </div>
           </div>
 
-          <div className="form-check text-start mb-3">
+          <div className="form-check text-start mb-2">
             <input
               className="form-check-input"
               type="checkbox"
@@ -188,9 +210,9 @@ export default function MatchMenu({
             </label>
           </div>
 
-          <div className="subMenu mb-4">
-            <label className="form-label fw-bold mb-1 d-block">
-              Dificultad del Motor
+          <div className="subMenu mb-2">
+            <label className="form-label  mb-1 d-block">
+              Dificultad 
             </label>
             <select
               className="form-select bg-dark text-white border-secondary"
@@ -210,25 +232,51 @@ export default function MatchMenu({
             </select>
           </div>
 
+          <div className="subMenu mb-4">
+            <label className="form-label mb-1 d-block">
+              Duración
+            </label>
+            <select
+              className="form-select bg-dark text-white border-secondary"
+              value={timeIndex}
+              onChange={handleTimeChange}
+            >
+              <option value={0}>Bullet: 1 min + 0s</option>
+              <option value={1}>Bullet: 1 min + 1s</option>
+              <option value={2}>Bullet: 2 min + 1s</option>
+              <option value={3}>Blitz: 3 min + 0s</option>
+              <option value={4}>Blitz: 3 min + 2s</option>
+              <option value={5}>Blitz: 5 min + 0s</option>
+              <option value={6}>Blitz: 5 min + 3s</option>
+              <option value={7}>Rapid: 10 min + 0s</option>
+              <option value={8}>Rapid: 10 min + 5s</option>
+              <option value={9}>Rapid: 15 min + 10s</option>
+            </select>
+          </div>
+
           {/* Botón Guardar solo cuando terminó la partida */}
           {showResult && (
-            <div className="text-center mt-3">
+            <div className="text-center mt-4">
+              <p className="result pb-1 mb-4 fs-4 fw-bold">
+                {getResultText()}
+              </p>
               {user && !hasSaved ? (
                 <button
                   onClick={handleSave}
-                  className="matchButton guardar"
+                  className="saveButton guardar mb-4"
                 >
                   Guardar Partida
                 </button>
               ) : hasSaved ? (
-                <p className="text-success fw-bold mt-2">
+                <p className="text-success fw-bold mt-2 mb-1">
                   Partida guardada ✓
                 </p>
               ) : null}
+              
             </div>
           )}
         </>
       )}
     </div>
   );
-}
+} 

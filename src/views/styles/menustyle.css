@@ -85,15 +85,24 @@ input {
 
 
 
-
-
-.board-header, .board-footer {
+.board-header{
   display: flex;
   justify-content: space-between;
-  padding: 10px 15px;
+  margin-bottom: 8px;
+  padding: 5px 15px;
   background: rgba(236, 236, 236, 0.068);
   color: #fff;
-  border-radius: 5px;
+  border-radius: 2px;
+}
+
+.board-footer {
+  display: flex;
+  margin-top: 8px;
+  justify-content: space-between;
+  padding: 7px 15px;
+  background: rgba(236, 236, 236, 0.068);
+  color: #fff;
+  border-radius: 2px;
 }
 
 .username {
