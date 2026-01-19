@@ -18,9 +18,31 @@ const Juego = () => {
   const [moveHistory, setMoveHistory] = useState([]);
   const [boardEvaluation, setBoardEvaluation] = useState(0);
   const [showEvaluationBar, setShowEvaluationBar] = useState(true);
-  const gameResult = useState(null);
+  const [gameResult, setGameResult] = useState(null);
 
-  console.log("Usuario", user)
+  const buildMatchData = () => {
+    return {
+      user: user?.data?.user?.name,
+      playerColor: selectedColor,
+      winner: gameResult.winner,
+      resultReason: gameResult.reason,
+      moveHistory,
+      totalMoves: moveHistory.length,
+      difficulty,
+      finalFen: gameResult.finalFen,
+    };
+  };
+
+  const handleSaveGame = () => {
+  const matchData = buildMatchData();
+
+  console.log("📦 PARTIDA A GUARDAR:", matchData);
+
+  // AQUÍ irá el POST en el futuro
+};
+
+
+
   // 🔥 DEBUG: Monitorear historial
   useEffect(() => {
     console.log("📊 HISTORIAL EN PADRE:", moveHistory);
@@ -40,6 +62,11 @@ const Juego = () => {
     setGameStarted(true);
     console.log("🚀 Partida iniciada con color:", finalColor);
   };
+
+  const handleGameEnd = (data) => {
+    setGameResult(data);
+  };
+
 
   const handleReset = () => {
     console.log("🔄 Reiniciando partida...");
@@ -81,6 +108,8 @@ const Juego = () => {
               onMoveHistory={setMoveHistory} // ✅ Directo y simple
               onEvaluation={setBoardEvaluation}
               difficulty={difficulty}
+              onGameEnd={handleGameEnd}
+              onSaveGame={handleSaveGame}
             />
             
             <div className="board-footer">
@@ -102,7 +131,9 @@ const Juego = () => {
             moveHistory={moveHistory}
             showEvaluationBar={showEvaluationBar}
             setShowEvaluationBar={setShowEvaluationBar}
-            gameResult={gameResult}
+            gameResult={gameResult}           // ← NUEVO
+            onSaveGame={handleSaveGame}
+            onGameEnd={handleGameEnd}
           />
         </div>
 

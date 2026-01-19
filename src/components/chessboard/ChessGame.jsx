@@ -9,27 +9,17 @@ const ChessGame = ({
   resetKey,
   onMoveHistory,
   onEvaluation,
-  difficulty
+  difficulty,
+  onGameEnd
 }) => {
   const [game, setGame] = useState(new Chess());
   const [boardOrientation, setBoardOrientation] = useState('white');
   const [isThinking, setIsThinking] = useState(false);
   const [boardWidth, setBoardWidth] = useState(400);
-
+  
   const stockfish = useRef(null);
   const moveHistoryRef = useRef([]); 
-
-  const getGameResultMessage = () => {
-  if (game.isCheckmate()) {
-    return game.turn() === "w"
-      ? "Negras GANAN"
-      : "Blancas GANAN";
-  }
-  if (game.isStalemate()) return "🤝 TABLAS por ahogado";
-  if (game.isThreefoldRepetition()) return "🤝 TABLAS por repetición";
-  if (game.isInsufficientMaterial()) return "🤝 TABLAS por material insuficiente";
-  if (game.isDraw()) return "🤝 TABLAS";
-};
+  const gameOverRef = useRef(false);
 
 
   // Mantener actualizado el color
@@ -115,22 +105,23 @@ const ChessGame = ({
 
   // REINICIO DEL JUEGO
   useEffect(() => {
-    console.log("🔄 REINICIANDO JUEGO COMPLETO");
-    const newGame = new Chess();
-    setGame(newGame);
-    moveHistoryRef.current = [];
-    setIsThinking(false);
-    
-    if (onMoveHistory) {
-      onMoveHistory([]);
-    }
-    if (onEvaluation) onEvaluation(0);
-    
-    if (stockfish.current) {
-      stockfish.current.postMessage('ucinewgame');
-      stockfish.current.postMessage('isready');
-    }
-  }, [resetKey, onMoveHistory, onEvaluation]);
+  console.log("🔄 REINICIANDO JUEGO COMPLETO");
+  const newGame = new Chess();
+  setGame(newGame);
+  moveHistoryRef.current = [];
+  setIsThinking(false);
+
+  gameOverRef.current = false; // 🔑 Reiniciamos el flag
+
+  if (onMoveHistory) onMoveHistory([]);
+  if (onEvaluation) onEvaluation(0);
+
+  if (stockfish.current) {
+    stockfish.current.postMessage('ucinewgame');
+    stockfish.current.postMessage('isready');
+  }
+}, [resetKey, onMoveHistory, onEvaluation]);
+
 
   // TURNO IA - Simple y efectivo
   useEffect(() => {
@@ -166,6 +157,23 @@ const ChessGame = ({
       stockfish.current.postMessage(`go depth ${config.depth}`);
     }
   }, [game, gameStarted, selectedColor, difficulty, isThinking]);
+
+  useEffect(() => {
+  if (game.isGameOver() && !gameOverRef.current) {
+    gameOverRef.current = true; // 🔒 bloqueamos futuras ejecuciones
+
+    let winner = "draw";
+    if (game.isCheckmate()) {
+      winner = game.turn() === "w" ? "black" : "white";
+    }
+
+    onGameEnd?.({
+      winner,
+      reason: game.isCheckmate() ? "checkmate" : "draw",
+      finalFen: game.fen(),
+    });
+  }
+}, [game, onGameEnd]);
 
   // MOVIMIENTO HUMANO
   function onDrop(sourceSquare, targetSquare) {
@@ -204,13 +212,6 @@ const ChessGame = ({
         }}
       />
 
-      <Result
-        isGameOver={game.isGameOver()}
-        result={getGameResultMessage()}
-        onRestart={() => {
-          if (typeof resetKey === "function") resetKey();
-        }}
-      />
     </div>
 
   );
