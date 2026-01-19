@@ -155,7 +155,7 @@ export default function MatchMenu({
             </div>
           </div>
 
-          <div className="text-center mt-4">
+          <div className="text-center mt-2">
             <button
               onClick={handleResign}
               className="matchButton rendirse"

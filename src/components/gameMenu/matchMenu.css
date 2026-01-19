@@ -2,7 +2,6 @@
 .match-menu-container {
   color: rgb(238, 238, 238);
   width: min(77vw, 77vh);
-  height: min(77vw, 77vh);
   background: #8383832f;
   box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
   padding: 1rem;
@@ -94,19 +93,20 @@
 }
 
 
-/* Historial */
 /* Historial - NUEVO ESTILO DE TABLA */
 .move-history {
-  height: 300px;
+  max-height: 60vh; /* ✅ 60% de la altura de la ventana */
   overflow-y: auto;
   background: #0000004d;
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 0.5rem;
   scrollbar-color: #666 #222;
 }
 
 .move-table {
   font-family: 'Courier New', monospace;
+   height: min(37vw, 37vh);
+  width: 100%;
   font-size: 0.95rem;
   color: #eee;
 }
@@ -114,7 +114,7 @@
 .table-header {
   display: grid;
   grid-template-columns: 40px 1fr 1fr;
-  padding: 7px 10px;
+  padding: 5px;
   background: #333333;
   border-radius: 6px;
   font-weight: bold;
@@ -127,7 +127,7 @@
 .table-row {
   display: grid;
   grid-template-columns: 40px 1fr 1fr;
-  padding: 6px 10px;
+  padding: 2px;
   border-bottom: 1px solid #444;
   text-align: center;
   transition: background 0.2s;

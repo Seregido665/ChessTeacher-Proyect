@@ -5,6 +5,7 @@ import EvaluationBar from '../../components/advantageBar/advantageBar';
 import ChessGame from '../../components/chessboard/ChessGame'; 
 import { useState, useEffect, useRef } from 'react';
 import { useContext } from "react";
+import { saveMatch } from "../../services/match.service";
 import AuthContext from "../../context/userContext";
 
 const Juego = () => {
@@ -22,26 +23,61 @@ const Juego = () => {
   const [increment, setIncrement] = useState(0);
   const timerRef = useRef(null);
 
-  const buildMatchData = () => {
-    return {
-      user: user?.data?.user?.name,
-      playerColor: selectedColor,
-      winner: gameResult.winner,
-      resultReason: gameResult.reason,
-      moveHistory,
-      totalMoves: moveHistory.length,
-      difficulty,
-      finalFen: gameResult.finalFen,
-    };
-  };
+const buildMatchData = () => {
+  // ✅ CORREGIDO: usar _id en lugar de id
+  const userId = user?.data?.user?._id || user?._id;
+  
+  if (!userId || !gameResult?.winner) {
+    console.error("❌ [buildMatchData] Falta userId o winner");
+    console.error("   - userId:", userId);
+    console.error("   - gameResult:", gameResult);
+    return null;
+  }
 
-  const handleSaveGame = () => {
+  return {
+    user: userId,  // ✅ Ahora será "696d0d057037b99d5d9452e6"
+    playerColor: selectedColor,
+    winner: gameResult.winner,
+    resultReason: gameResult.reason,
+    moveHistory,
+    totalMoves: moveHistory.length,
+    difficulty,
+    finalFen: gameResult.finalFen,
+  };
+};
+
+
+
+
+ const handleSaveGame = () => {
+  // 🔍 LOGS DE DEPURACIÓN - ANTES DE buildMatchData
+  console.log("🔍 === DEPURACIÓN handleSaveGame ===");
+  console.log("🔍 user completo:", user);
+  console.log("🔍 user?.data?.user?.id:", user?.data?.user?.id);
+  console.log("🔍 user?.id:", user?.id);
+  console.log("🔍 gameResult completo:", gameResult);
+  console.log("🔍 gameResult?.winner:", gameResult?.winner);
+  console.log("🔍 selectedColor:", selectedColor);
+  console.log("🔍 moveHistory.length:", moveHistory.length);
+  console.log("🔍 difficulty:", difficulty);
+  
   const matchData = buildMatchData();
 
-  console.log("📦 PARTIDA A GUARDAR:", matchData);
+  // 🔍 LOG DESPUÉS DE buildMatchData
+  console.log("🔍 matchData generado:", matchData);
 
-  // AQUÍ irá el POST en el futuro
+  if (!matchData) {
+    console.error("❌ No se puede guardar: partida no finalizada");
+    return;
+  }
+
+  console.log("🧪 matchData:", matchData); // Este ya lo tenías
+
+  saveMatch(matchData)
+    .then(() => console.log("✅ Partida guardada"))
+    .catch(err => console.error("❌ Error al guardar:", err.response?.data));
 };
+
 
 
 
@@ -74,7 +110,11 @@ const Juego = () => {
 
 
   const handleGameEnd = (data) => {
-    setGameResult(data);
+    setGameResult({
+      winner: data.winner || "draw",   // nunca undefined
+      reason: data.reason || "unknown",
+      finalFen: data.finalFen || ""
+    });
   };
 
 
