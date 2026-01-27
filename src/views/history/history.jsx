@@ -1,28 +1,34 @@
 import "../styles/menustyle.css";
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import MatchCard from '../../components/matchCard/matchCard';
 import AsideMenu from '../../components/asideMenu/aside';
-import { getMatches } from '../../services/match.service'
+import { getMatches } from '../../services/match.service';
+import AuthContext from '../../context/authContext';
 
 const Historial = () => {
+  const { user } = useContext(AuthContext);
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    getMatches()
-      .then((response) => {
-        console.log('Matches fetched:', response.data);
+    if (!user) return;
+
+    const fetchMatches = async () => {
+      try {
+        const response = await getMatches();
+        console.log("Partidas del usuario:", response.data);
         setMatches(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching matches:', error);
+      } catch (err) {
+        console.error("Error al cargar", err);
         setError('Error al cargar el historial de partidas');
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchMatches();
+  }, [user]);
 
   return (
     <div className="vh-100 d-flex img-fondo2">
@@ -39,13 +45,6 @@ const Historial = () => {
         <div className="col-xl-6 col-md-6 col-12 d-flex flex-column align-items-center justify-content-start py-4">
           <h2 className="text-white mb-4">Historial de Partidas</h2>
           
-          {loading && (
-            <div className="text-white">Cargando partidas...</div>
-          )}
-
-          {error && (
-            <div className="alert alert-danger">{error}</div>
-          )}
 
           {!loading && !error && matches.length === 0 && (
             <div className="text-white text-center">

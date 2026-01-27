@@ -6,10 +6,16 @@ import ChessGame from '../../components/chessboard/ChessGame';
 import { useState, useEffect, useRef } from 'react';
 import { useContext } from "react";
 import { saveMatch } from "../../services/match.service";
-import AuthContext from "../../context/userContext";
+import AuthContext from "../../context/authContext";
 
 const Juego = () => {
   const { user } = useContext(AuthContext);
+  
+  useEffect(() => {
+    console.log("💡 Usuario actual:", user);
+    console.log("💡 user._id:", user?._id || "No logueado");
+  }, [user]);
+
 
   const [gameStarted, setGameStarted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -25,12 +31,10 @@ const Juego = () => {
 
 const buildMatchData = () => {
   // ✅ CORREGIDO: usar _id en lugar de id
-  const userId = user?.data?.user?._id || user?._id;
+  const userId = user?._id;
   
   if (!userId || !gameResult?.winner) {
-    console.error("❌ [buildMatchData] Falta userId o winner");
     console.error("   - userId:", userId);
-    console.error("   - gameResult:", gameResult);
     return null;
   }
 
@@ -50,29 +54,10 @@ const buildMatchData = () => {
 
 
  const handleSaveGame = () => {
-  // 🔍 LOGS DE DEPURACIÓN - ANTES DE buildMatchData
-  console.log("🔍 === DEPURACIÓN handleSaveGame ===");
-  console.log("🔍 user completo:", user);
-  console.log("🔍 user?.data?.user?.id:", user?.data?.user?.id);
-  console.log("🔍 user?.id:", user?.id);
-  console.log("🔍 gameResult completo:", gameResult);
-  console.log("🔍 gameResult?.winner:", gameResult?.winner);
-  console.log("🔍 selectedColor:", selectedColor);
-  console.log("🔍 moveHistory.length:", moveHistory.length);
-  console.log("🔍 difficulty:", difficulty);
-  
   const matchData = buildMatchData();
 
-  // 🔍 LOG DESPUÉS DE buildMatchData
   console.log("🔍 matchData generado:", matchData);
-
-  if (!matchData) {
-    console.error("❌ No se puede guardar: partida no finalizada");
-    return;
-  }
-
-  console.log("🧪 matchData:", matchData); // Este ya lo tenías
-
+  
   saveMatch(matchData)
     .then(() => console.log("✅ Partida guardada"))
     .catch(err => console.error("❌ Error al guardar:", err.response?.data));
@@ -99,19 +84,19 @@ const buildMatchData = () => {
       setSelectedColor(finalColor);
     }
 
-    clearInterval(timerRef.current);      // 🔥 CLAVE
+    clearInterval(timerRef.current);      
     setTimeLeft(timeControl.base);
     setIncrement(timeControl.increment);
     setGameStarted(true);
 
-    startTimer();                          // 🔥 ARRANQUE LIMPIO
+    startTimer();                         
   };
 
 
 
   const handleGameEnd = (data) => {
     setGameResult({
-      winner: data.winner || "draw",   // nunca undefined
+      winner: data.winner || "draw",   
       reason: data.reason || "unknown",
       finalFen: data.finalFen || ""
     });
@@ -201,7 +186,7 @@ useEffect(() => {
             />
             
             <div className="board-footer">
-              <span className="username"> {user?.data?.user?.name || "Invitado"} </span>
+              <span className="username"> {user?._id || "Invitado"} </span>
               <div className="right">
                 <span className="tiempo">
                   {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:

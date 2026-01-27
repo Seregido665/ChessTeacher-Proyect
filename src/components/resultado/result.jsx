@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import AuthContext from "../../context/userContext";
+import AuthContext from "../../context/authContext";
 import "./reuslt.css";
 
 const Result = ({ isGameOver, result, saveMatch }) => {

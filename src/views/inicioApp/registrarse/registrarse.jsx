@@ -50,11 +50,11 @@ const Registrarse = () => {
 
     registerUser(registerData)
         .then(() => {
-        setErrors({});
-        navigate('/inicioSesion');
+            setErrors({});
+            navigate('/inicioSesion');
         })
         .catch(err => {
-        setErrors(err.response?.data?.errors || {});
+            setErrors(err.response?.data?.errors || {});
         });
     };
 

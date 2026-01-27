@@ -7,3 +7,7 @@ export const saveMatch = (userData) => {
 export const getMatches = () => {
   return apiClient.get("/matches");
 };
+
+export const deleteMatch = (id) => {
+  return apiClient.delete(`/matches/${id}`);
+};

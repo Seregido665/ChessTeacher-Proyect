@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import AuthContext from "../../context/userContext";
+import AuthContext from "../../context/authContext";
 import "./matchMenu.css";
 
 export default function MatchMenu({

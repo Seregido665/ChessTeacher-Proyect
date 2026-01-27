@@ -1,73 +1,64 @@
 import "../../styles/menustyle.css";
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from "../../../services/user.service";
-import AuthContext from "../../../context/userContext"
+import AuthContext from "../../../context/authContext"
 import Button from '../../../components/bbuttons/button'
 
 
 const Sesion = () => {
     const navigate = useNavigate();
-    const { userLogin } = useContext(AuthContext)
+    const { handleSetUser } = useContext(AuthContext);
     const [errors, setErrors] = useState({});
-    const [loginData, setFormData] = useState({
+    const [loginData, setLoginData] = useState({
       email: '',
       password: ''
     })
 
-    useEffect(() => {
-        if (localStorage.getItem('user')) {
-            navigate('/game');
-        }
-    }, [navigate]);     // EJECUTA useEffect CUANDO navigate CAMBIE
-
     const handleChange = (e) => {
     const { name, value } = e.target
-        setFormData(prev => ({
+        setLoginData(prev => ({
         ...prev,
         [name]: value
         }))
     }
 
-const handleLogin = (e) => {
-  e.preventDefault();
+    const handleLogin = (e) => {
+        e.preventDefault();
 
-  const newErrors = {};
-  if (!loginData.email) { newErrors.email = { message: "Falta el email." }; }
-  if (!loginData.password) { newErrors.password = { message: "Falta la contraseña." }; }
+        const newErrors = {};
+        if (!loginData.email) { newErrors.email = { message: "Falta el email." }; }
+        if (!loginData.password) { newErrors.password = { message: "Falta la contraseña." }; }
 
-  const emailRegex = /^[\w.-]+@[\w.-]+\.\w{2,3}$/;
-  if (loginData.email && !emailRegex.test(loginData.email)) {
-    newErrors.email = { message: "Estructura incorrecta" };
-  }
+        const emailRegex = /^[\w.-]+@[\w.-]+\.\w{2,3}$/;
+        if (loginData.email && !emailRegex.test(loginData.email)) {
+            newErrors.email = { message: "Estructura incorrecta" };
+        }
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    return;
-  }
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
 
-  loginUser(loginData)
-    .then((user) => {
-      //localStorage.setItem('authUser', JSON.stringify(response.data.user));
-      console.log(user)
-      setErrors({});
-      userLogin(user)
-      console.log("LOGUEADO");
-      navigate('/game');
-    })
-    .catch((err) => {
-      console.log('ERROR EN EL LOGIN:', err);
-      
-      const serverMessage = err.response?.data?.message;
-      if (serverMessage === "El usuario no existe") {
-        setErrors({ email: { message: serverMessage } });
-      } else if (serverMessage === "Contraseña incorrecta") {
-        setErrors({ password: { message: serverMessage } });
-      } else {
-        setErrors({ general: { message: serverMessage || "Error al conectar" } });
-      }
-    });
-};
+        loginUser(loginData)
+            .then((user) => {
+                setErrors({});
+                handleSetUser(user.data);
+                console.log("LOGUEADO");
+                navigate('/game');
+            })
+            .catch((err) => {
+                const serverMessage = err.response?.data?.message;
+                if (serverMessage === "El usuario no existe") {
+                    setErrors({ email: { message: serverMessage } });
+                } else if (serverMessage === "Contraseña incorrecta") {
+                    setErrors({ password: { message: serverMessage } });
+                } else {
+                    setErrors({ general: { message: serverMessage || "Error al conectar" } });
+                }
+            }
+        );
+    };
 
     return (
         <div className="fondo img-fondo1">
