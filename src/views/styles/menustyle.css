@@ -126,6 +126,14 @@ input {
 }
 
 
+.match-history-tittle{
+  font-family: sans-serif;
+  display: flex;      
+  justify-content: center;
+  width: 50%;
+}
+
+
 
 
 

@@ -219,16 +219,16 @@ export default function MatchMenu({
               value={localDifficulty}
               onChange={handleDifficultyChange}
             >
-              <option value={0}>Nivel 0 (200 - 500)</option>
-              <option value={1}>Nivel 1 (500 - 800)</option>
-              <option value={2}>Nivel 2 (800 - 1000)</option>
-              <option value={3}>Nivel 3 (1000 - 1200)</option>
-              <option value={4}>Nivel 4 (1200 - 1500)</option>
-              <option value={5}>Nivel 5 (1500 - 1800)</option>
-              <option value={6}>Nivel 6 (1800 - 2000)</option>
-              <option value={7}>Nivel 7 (2000 - 2200)</option>
-              <option value={8}>Nivel 8 (2200 - 2400)</option>
-              <option value={9}>Nivel 9 (2400+)</option>
+              <option value={0}>0 - (200 - 500)</option>
+              <option value={1}>1 - (500 - 800)</option>
+              <option value={2}>2 - (800 - 1000)</option>
+              <option value={3}>3 - (1000 - 1200)</option>
+              <option value={4}>4 - (1200 - 1500)</option>
+              <option value={5}>5 - (1500 - 1800)</option>
+              <option value={6}>6 - (1800 - 2000)</option>
+              <option value={7}>7 - (2000 - 2200)</option>
+              <option value={8}>8 - (2200 - 2400)</option>
+              <option value={9}>9 - (2400+)</option>
             </select>
           </div>
 
@@ -241,16 +241,16 @@ export default function MatchMenu({
               value={timeIndex}
               onChange={handleTimeChange}
             >
-              <option value={0}>Bullet: 1 min + 0s</option>
-              <option value={1}>Bullet: 1 min + 1s</option>
-              <option value={2}>Bullet: 2 min + 1s</option>
-              <option value={3}>Blitz: 3 min + 0s</option>
-              <option value={4}>Blitz: 3 min + 2s</option>
-              <option value={5}>Blitz: 5 min + 0s</option>
-              <option value={6}>Blitz: 5 min + 3s</option>
-              <option value={7}>Rapid: 10 min + 0s</option>
-              <option value={8}>Rapid: 10 min + 5s</option>
-              <option value={9}>Rapid: 15 min + 10s</option>
+              <option value={0}>Bullet - 1 min</option>
+              <option value={1}>Bullet - 1 | 1</option>
+              <option value={2}>Bullet -- 2 | 1</option>
+              <option value={3}>Blitz --- 3 min</option>
+              <option value={4}>Blitz --- 3 | 2</option>
+              <option value={5}>Blitz ----- 5 min</option>
+              <option value={6}>Blitz ----- 5 | 3</option>
+              <option value={7}>Rapid ---------- 10 min</option>
+              <option value={8}>Rapid ---------- 10 | 5</option>
+              <option value={9}>Rapid --------------- 15 | 10</option>
             </select>
           </div>
 

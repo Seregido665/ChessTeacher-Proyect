@@ -2,7 +2,7 @@ import "../styles/menustyle.css";
 import { useContext, useEffect, useState } from 'react'
 import MatchCard from '../../components/matchCard/matchCard';
 import AsideMenu from '../../components/asideMenu/aside';
-import { getMatches } from '../../services/match.service';
+import { getMatches, deleteMatch } from '../../services/match.service';
 import AuthContext from '../../context/authContext';
 
 const Historial = () => {
@@ -12,23 +12,36 @@ const Historial = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    const fetchMatches = async () => {
-      try {
-        const response = await getMatches();
-        console.log("Partidas del usuario:", response.data);
-        setMatches(response.data);
-      } catch (err) {
-        console.error("Error al cargar", err);
-        setError('Error al cargar el historial de partidas');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchMatches = async () => {
+    try {
+      const response = await getMatches();
 
-    fetchMatches();
-  }, [user]);
+      setMatches(response.data);
+    } catch (err) {
+      console.error("Error al cargar", err);
+      setError('Error al cargar el historial de partidas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchMatches();
+}, [user]);
+
+  // -- ELIMINAR PARTIDA --
+  const handleDelete = async (matchId) => {
+    if (!window.confirm('¿Seguro que quieres borrar esta partida?')) return;
+
+    try {
+      await deleteMatch(matchId);
+      setMatches((prevMatches) => prevMatches.filter(m => m.id !== matchId));
+    } catch (err) {
+      console.error("Error al eliminar partida:", err);
+      alert("No se pudo eliminar la partida. Inténtalo de nuevo.");
+    }
+  };
 
   return (
     <div className="vh-100 d-flex img-fondo2">
@@ -42,10 +55,8 @@ const Historial = () => {
           </aside>
         </div>
 
-        <div className="col-xl-6 col-md-6 col-12 d-flex flex-column align-items-center justify-content-start py-4">
-          <h2 className="text-white mb-4">Historial de Partidas</h2>
-          
-
+        <div className="col-xl-10 col-md-9 col-12 d-flex flex-column align-items-center justify-content-start py-4">
+          <h2 className="text-white mb-4 match-history-tittle">Historial de Partidas</h2>
           {!loading && !error && matches.length === 0 && (
             <div className="text-white text-center">
               <p>No tienes partidas guardadas aún</p>
@@ -54,24 +65,32 @@ const Historial = () => {
           )}
 
           {!loading && matches.length > 0 && (
-            <div className="w-100 d-flex flex-column align-items-center" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+            <div 
+              className="w-100"
+              style={{ 
+                maxHeight: '80vh', 
+                overflowY: 'auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))',  // ← clave
+                gap: '16px',
+                padding: '0 8px'
+              }}
+            >
               {matches.map((match) => (
-                <MatchCard key={match._id} match={match} />
+                <MatchCard 
+                  key={match.id}
+                  match={match} 
+                  onDelete={handleDelete}
+                  //onExportPGN={/* tu función */} 
+                />
               ))}
             </div>
           )}
         </div>
-
-        <div className="col-xl-3 col-md-3 col-12">
-          <section>
-            {/* Aquí puedes agregar estadísticas o filtros */}
-          </section>
-        </div>
-        
-        <div className="col-xl-1"></div>
       </div>
     </div>
   );
 };
 
 export default Historial;
+

@@ -13,8 +13,22 @@ function App() {
    <>
       <div>
         <Routes>
-          <Route path="/mainInicio" element={<Inicio />} />
-          <Route path="/registrarse" element={<Registrarse />} />
+          <Route 
+            path="/mainInicio" 
+            element={
+              <PublicRoute>
+                <Inicio />
+              </PublicRoute>
+            } 
+          />
+          <Route 
+            path="/registrarse" 
+            element={
+              <PublicRoute>
+                <Registrarse />
+              </PublicRoute>
+            } 
+          />
           <Route 
             path="/inicioSesion" 
             element={
