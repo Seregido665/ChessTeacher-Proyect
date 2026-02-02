@@ -38,6 +38,7 @@
 }
 .colorButton.gradient {
   background: linear-gradient(135deg, #ffffff, #d0d0d0, #707070, #000000);
+  max-width: 30px;
 }
 
 .colorButton.selected {
