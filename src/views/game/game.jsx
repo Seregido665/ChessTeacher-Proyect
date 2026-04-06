@@ -7,7 +7,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useContext } from "react";
 import { saveMatch } from "../../services/match.service";
 import AuthContext from "../../context/authContext";
-import { Navigate } from 'react-router-dom';
 
 const Juego = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -190,11 +189,7 @@ const Juego = () => {
     );
   }
 
-  // Si después de loading no hay user válido, redirigir
-  if (!user || !user._id) {
-    console.warn("⚠️ No hay usuario autenticado después de cargar.");
-    return <Navigate to="/inicioSesion" replace />;
-  }
+  // Si no hay usuario, puede seguir jugando pero sin guardar partidas
 
   return (
     <div className="vh-100 d-flex img-fondo2">
@@ -232,7 +227,7 @@ const Juego = () => {
             />
             
             <div className="board-footer">
-              <span className="username"> {user.name || "Invitado"} </span>
+              <span className="username"> {user?.name || "Invitado"} </span>
               <div className="right">
                 <span className="tiempo">
                   {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:

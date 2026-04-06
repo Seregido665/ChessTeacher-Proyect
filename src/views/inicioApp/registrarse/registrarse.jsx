@@ -125,7 +125,7 @@ const Registrarse = () => {
                                 <button 
                                     className="simple" 
                                     onClick={() => navigate("/game")}>
-                                    Probar juego.
+                                    Probar.
                                 </button>
                             </div>
                         </section>

@@ -166,7 +166,6 @@ const ChessGame = ({
   useEffect(() => {
     if (gameRef.current.isGameOver() && !gameOverRef.current) {
       gameOverRef.current = true;
-      console.log("🏁 Juego terminado");
 
       let winner = "draw";
       if (gameRef.current.isCheckmate()) {
