@@ -1,8 +1,14 @@
 import './matchCard.css';
+import { useNavigate } from 'react-router-dom';
 
 const MatchCard = ({ match, onDelete, onExportPGN }) => {
+  const navigate = useNavigate();
   const playerWon = match.winner === match.playerColor;
   const isDraw = match.winner === 'draw';
+
+  const handleAnalyze = () => {
+    navigate('/analysis', { state: { match } });
+  };
 
   return (
     <div className={`match-card ${isDraw ? 'draw' : playerWon ? 'victory' : 'defeat'}`}>
@@ -18,7 +24,7 @@ const MatchCard = ({ match, onDelete, onExportPGN }) => {
           <div className="match-actions">
             <button 
             className="btn-action btn-analyze" 
-            //onClick={}
+            onClick={handleAnalyze}
           >
             Analizar
           </button>

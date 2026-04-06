@@ -38,6 +38,12 @@ export default function AsideMenu() {
           action={() => navigate("/history")}
         />
         <ButtonLeft
+          img="/menuIcons/LessonW.png"
+          type="butStyle"
+          text="ANÁLISIS"
+          action={() => navigate("/analysis")}
+        />
+        <ButtonLeft
           img="/menuIcons/PuzzleW.png"
           type="butStyle"
           text="EJERCICIOS"

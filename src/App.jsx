@@ -6,6 +6,7 @@ import Historial from "./views/history/history"
 import Juego from "./views/game/game"
 import Ejercicios from "./views/exercises/exercises"
 import Reglas from "./views/rules/rules"
+import Analisis from "./views/analisis/analisis"
 import { ProtectedRoute, PublicRoute } from './components/ProtectedRoutes';
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
           <Route path="/history" element={<Historial />} />
           <Route path="/exercises" element={<Ejercicios />} />
           <Route path="/rules" element={<Reglas />} />
+          <Route path="/analysis" element={<Analisis />} />
           <Route path="*" element={<Inicio />} />
         </Routes>
         

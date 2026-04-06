@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import AuthContext from "../../context/authContext";
 import ConfigMenu from './configMenu';
 import GameMatchMenu from './gameMatchMenu';
+import AnalyzeMenu from './analyzeMenu';
 import "./matchMenu.css";
 
 export default function MatchMenu({
@@ -18,6 +19,8 @@ export default function MatchMenu({
   gameResult,
   onSaveGame,
   onGameEnd,
+  isAnalysisMode = false, // ✅ NUEVA prop para modo análisis
+  match, // ✅ NUEVA prop para datos del match en análisis
 }) {
   const { user } = useContext(AuthContext);
 
@@ -26,7 +29,13 @@ export default function MatchMenu({
 
   return (
     <div className="match-menu-container">
-      {isGameActive ? (
+      {isAnalysisMode ? (
+        // Modo ANÁLISIS
+        <AnalyzeMenu
+          match={match}
+          moveHistory={moveHistory}
+        />
+      ) : isGameActive ? (
         // Modo PARTIDA EN CURSO
         <GameMatchMenu
           moveHistory={moveHistory}
