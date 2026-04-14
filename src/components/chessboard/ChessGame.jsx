@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import Result from "../resultado/result";
+import './chessboard.css';
 
 const ChessGame = ({
   gameStarted,
@@ -10,7 +11,8 @@ const ChessGame = ({
   onMoveHistory,
   onEvaluation,
   difficulty,
-  onGameEnd
+  onGameEnd,
+  className = ''
 }) => {
   const [game, setGame] = useState(() => new Chess());
   const [boardOrientation, setBoardOrientation] = useState('white');
@@ -306,7 +308,10 @@ const ChessGame = ({
   };
 
   return (
-    <div style={{ position: "relative", width: boardWidth, height: boardWidth }}>
+    <div
+      className={`chessgame-wrapper ${className}`.trim()}
+      style={{ '--board-size': `${boardWidth}px` }}
+    >
       <Chessboard
         boardWidth={boardWidth}
         position={game.fen()}
@@ -321,15 +326,10 @@ const ChessGame = ({
       />
 
       {/* Overlay para los círculos de movimientos legales (por encima de las piezas) */}
-      <div style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: boardWidth,
-        height: boardWidth,
-        pointerEvents: "none",
-        zIndex: 10,
-      }}>
+      <div
+        className="chessgame-overlay"
+        style={{ width: boardWidth, height: boardWidth }}
+      >
         {legalMoves.map(square => {
           const { x, y, size } = getSquarePosition(square);
           const circleSize = size * 0.32;

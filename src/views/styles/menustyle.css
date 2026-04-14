@@ -117,6 +117,24 @@ input {
   text-shadow: 0 2px 8px rgb(0, 0, 0);
 }
 
+.game-board-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  justify-content: center;
+}
+
+.game-board-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-board-layout .evaluation-bar {
+  align-self: stretch;
+  height: auto;
+  margin-right: 0;
+}
+
 
 .board {
   height: 40vh;           /* 90% de la altura de la pantalla */
@@ -130,7 +148,42 @@ input {
   font-family: sans-serif;
   display: flex;      
   justify-content: center;
-  width: 50%;
+  width: 60%;
+  font-weight: bold;
+  font-size: 30px;
+  margin-top: 20px;
+}
+
+.import-btn {
+  width: 220px;
+  background-color: #ea8622a5;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .historyMenu {
+    margin-left: 70px;
+  }
+}
+
+@media (max-width: 767px) {
+  .row {
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+
+  .game-board-layout {
+    justify-content: center;
+    margin-top: 30px;
+  }
+  .match-history-tittle{
+    top: 100px;
+    position: absolute;
+    width: 100%;
+  }
 }
 
 

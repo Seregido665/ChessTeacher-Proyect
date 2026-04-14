@@ -1,6 +1,6 @@
 import './matchCard.css';
 import { useNavigate } from 'react-router-dom';
-import { exportMatchAsPGN } from './exportPGN';
+import { exportMatchAsPGN } from '../../utils/exportPGN';
 
 const MatchCard = ({ match, onDelete, onExportPGN }) => {
   const navigate = useNavigate();

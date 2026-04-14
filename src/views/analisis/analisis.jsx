@@ -218,48 +218,48 @@ const Analisis = () => {
     }, []);
 
     return (
-      <div className="vh-100 d-flex img-fondo2">
-        <div className="row w-100 m-0 flex-grow-1">
-
-            <div className="col-xl-2 col-md-3 col-12 px-0 d-flex">
+      <div className="vh-100 img-fondo2">
+        <div className="row w-100 h-100 m-0">
+            <div className="col-xl-2 col-md-1 col-12 px-0 d-flex">
                 <aside className="menuLateral">
                     <AsideMenu />
                 </aside>
             </div>
-
-            <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
-                <EvaluationBar
-                    evaluation={boardEvaluation}
-                    playerColor={match?.playerColor || 'white'}
-                />
-                <div className="">
-                    <div className="board-header">
-                        <span className="username">Dificultad {match?.difficulty ?? '-'}</span>
-                    </div>
-                    
-                    {/* TABLERO DE AJEDREZ */}
-                    <Chessboard 
-                        position={game.fen()}
-                        boardOrientation={boardOrientation}
-                        arePixelsAnimated={true}
-                        boardWidth={boardWidth}
-                        customArrows={bestMoveArrow}
+            <div className="col-xl-6 col-md-7 col-12 d-flex align-items-center justify-content-center">
+                <div className="game-board-layout">
+                    <EvaluationBar
+                        evaluation={boardEvaluation}
+                        playerColor={match?.playerColor || 'white'}
                     />
-                    
-                    <div className="board-footer">
-                        <span className="username">
-                            {match ? `${match.winner === 'draw' ? 'Empate' : match.winner === match.playerColor ? 'Victoria' : 'Derrota'}` : 'Jugador'}
-                        </span>
-                        <div className="right">
-                            <span className="tiempo">
-                                {match ? `Movimientos: ${match.moveHistory?.length || 0}` : ''}
+                    <div className="">
+                        <div className="board-header">
+                            <span className="username">Dificultad {match?.difficulty ?? '-'}</span>
+                        </div>
+                        
+                        {/* TABLERO DE AJEDREZ */}
+                        <Chessboard 
+                            position={game.fen()}
+                            boardOrientation={boardOrientation}
+                            arePixelsAnimated={true}
+                            boardWidth={boardWidth}
+                            customArrows={bestMoveArrow}
+                        />
+                        
+                        <div className="board-footer">
+                            <span className="username">
+                                {match ? `${match.winner === 'draw' ? 'Empate' : match.winner === match.playerColor ? 'Victoria' : 'Derrota'}` : 'Jugador'}
                             </span>
+                            <div className="right">
+                                <span className="tiempo">
+                                    {match ? `Movimientos: ${match.moveHistory?.length || 0}` : ''}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="col-xl-3 col-md-3 col-12 d-flex align-items-center justify-content-center">
+            <div className="col-xl-4 col-md-4 col-12 d-flex align-items-center justify-content-center">
                 <MatchMenu 
                     isAnalysisMode={true}
                     match={match}
@@ -273,7 +273,6 @@ const Analisis = () => {
                     moveQualities={moveQualities}
                 />
             </div>
-            <div className="col-xl-1"></div>
         </div>
     </div>
     )

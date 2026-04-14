@@ -7,16 +7,13 @@ const Ejercicios = () => {
     //const navigate = useNavigate();
 
     return (
-      <div className="vh-100 d-flex img-fondo2">
-        <div className="row w-100 m-0 flex-grow-1">
-
-            <div className="col-xl-2 col-md-3 col-12 px-0 d-flex">
-                <aside className="menuLateral w-100">
-                    <div className="d-flex flex-column">
-                        <AsideMenu />
-                    </div>
+      <div className="vh-100 img-fondo2">
+            <div className="row w-100 h-100 m-0">
+              <div className="col-xl-2 col-md-1 col-12 px-0 d-flex">
+                <aside className="menuLateral">
+                  <AsideMenu />
                 </aside>
-            </div>
+              </div>
 
             <div className="col-xl-6 col-md-6 col-12 d-flex align-items-center justify-content-center">
                 {/*}

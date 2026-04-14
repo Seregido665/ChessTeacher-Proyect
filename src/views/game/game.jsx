@@ -203,52 +203,53 @@ const Juego = () => {
   // Si no hay usuario, puede seguir jugando pero sin guardar partidas
 
   return (
-    <div className="vh-100 d-flex img-fondo2">
-      <div className="row w-100 m-0 flex-grow-1">
-
-        <div className="col-xl-2 col-md-3 col-12 px-0 d-flex">
+    <div className="vh-100 img-fondo2">
+      <div className="row w-100 h-100 m-0">
+        <div className="col-xl-2 col-md-1 col-12 px-0 d-flex">
           <aside className="menuLateral">
             <AsideMenu />
           </aside>
         </div>
-            
-        <div className="col-xl-6 col-md-6 col-12 flex-row d-flex align-items-center justify-content-center">
-          {showEvaluationBar && (
-            <EvaluationBar
-              evaluation={boardEvaluation}
-              playerColor={selectedColor}
-            />
-          )}
+        <div className="col-xl-6 col-md-7 col-12 d-flex align-items-center justify-content-center">
+          <div className="game-board-layout">
+            {showEvaluationBar && (
+              <EvaluationBar
+                evaluation={boardEvaluation}
+                playerColor={selectedColor}
+              />
+            )}
 
-          <div className="">
-            <div className="board-header">
-              <span className="username">Dificultad {difficulty}</span>
-            </div>
-            
-            {/* TABLERO DE AJEDREZ */}
-            <ChessGame 
-              gameStarted={gameStarted}
-              selectedColor={selectedColor}
-              resetKey={resetKey}
-              onMoveHistory={setMoveHistory}
-              onEvaluation={setBoardEvaluation}
-              difficulty={difficulty}
-              onGameEnd={handleGameEnd}
-              onSaveGame={handleSaveGame}
-            />
-            
-            <div className="board-footer">
-              <span className="username"> {user?.name || "Invitado"} </span>
-              <div className="right">
-                <span className="tiempo">
-                  {formattedTime}
-                </span>
+            <div className="game-board-panel">
+              <div className="board-header">
+                <span className="username">Dificultad {difficulty}</span>
+              </div>
+              
+              {/* TABLERO DE AJEDREZ */}
+              <ChessGame 
+                className="game-chessboard"
+                gameStarted={gameStarted}
+                selectedColor={selectedColor}
+                resetKey={resetKey}
+                onMoveHistory={setMoveHistory}
+                onEvaluation={setBoardEvaluation}
+                difficulty={difficulty}
+                onGameEnd={handleGameEnd}
+                onSaveGame={handleSaveGame}
+              />
+              
+              <div className="board-footer">
+                <span className="username"> {user?.name || "Invitado"} </span>
+                <div className="right">
+                  <span className="tiempo">
+                    {formattedTime}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="col-xl-3 col-md-3 col-12 d-flex align-items-center justify-content-center">
+        <div className="matchMenu col-xl-4 col-md-4 col-12 d-flex align-items-center justify-content-center">
           <MatchMenu
             gameStarted={gameStarted}
             onStartGame={handleStart}
@@ -265,8 +266,6 @@ const Juego = () => {
             onGameEnd={handleGameEnd}
           />
         </div>
-
-        <div className="col-xl-1"></div>
       </div>
     </div>
   );

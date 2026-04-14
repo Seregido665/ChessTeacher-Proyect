@@ -45,8 +45,8 @@ export default function AsideMenu() {
         />
         <ButtonLeft
           img="/menuIcons/RulesW.png"
-          type="butStyle"
-          text="REGLAS"
+          type="butStyle2"
+          text="INFO.APP"
           action={() => navigate("/rules")}
         />
       </nav>
@@ -58,13 +58,13 @@ export default function AsideMenu() {
           <>
             <Button
               type="enPlay"
-              text="REGISTRARSE"
+              text={<><span className="auth-label-full">REGISTRARSE</span><span className="auth-label-short">R</span></>}
               color="verde"
               action={() => navigate("/registrarse")}
             />
             <Button
               type="enPlay"
-              text="INICIAR SESIÓN"
+              text={<><span className="auth-label-full">INICIAR SESIÓN</span><span className="auth-label-short">I</span></>}
               color="azul"
               action={() => navigate("/inicioSesion")}
             />
@@ -75,7 +75,7 @@ export default function AsideMenu() {
       </div>
       <ButtonLeftExit
           typeExit="exit"
-          text={isLoggedIn ? "LogOut" : "Salir"}
+          text={<><span className="exit-label">Salir</span><img className="exit-icon" src="/Off.png" alt="Salir" /></>}
           action={isLoggedIn ? onLogout : () => navigate("/mainInicio")}
         />
     </div>

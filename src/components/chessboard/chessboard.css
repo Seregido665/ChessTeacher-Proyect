@@ -1,0 +1,29 @@
+.chessgame-wrapper {
+  position: relative;
+  width: var(--board-size);
+  height: var(--board-size);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.chessgame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .chessgame-wrapper {
+    width: min(var(--board-size), 92vw);
+    height: min(var(--board-size), 92vw);
+  }
+}
+
+@media (max-width: 767px) {
+  .chessgame-wrapper {
+    width: min(var(--board-size), 95vw);
+    height: min(var(--board-size), 95vw);
+  }
+}

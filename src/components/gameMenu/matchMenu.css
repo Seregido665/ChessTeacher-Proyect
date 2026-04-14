@@ -243,3 +243,12 @@
   
 }
 
+
+
+@media (max-width: 767px) {
+  .match-menu-container {
+  color: rgb(238, 238, 238);
+  width: 60%;
+  margin-block: 30px;
+}
+}

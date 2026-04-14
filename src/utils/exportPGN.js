@@ -66,4 +66,3 @@ export const exportMatchAsPGN = (match) => {
 	downloadPgnFile(match, pgnText);
 	return pgnText;
 };
-

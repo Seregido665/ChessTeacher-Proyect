@@ -1,7 +1,6 @@
 .imgBut {
   max-width: 30px;
 }
-
 .menuLateral {
   width: 280px;                    /* Ancho cómodo */
   height: 100vh;
@@ -13,6 +12,7 @@
   top: 0;
   overflow: hidden;
   box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
+  padding: 10px;
 }
 
 .logo-container {
@@ -102,9 +102,236 @@ nav {
   margin-bottom: 5px;
   height: 45px;
 }
+.butStyle2 {
+  background-color: #000000c6;
+  color: white;
+  margin-bottom: 5px;
+  max-width: 80%;
+  margin: 0 auto; 
+  margin-top: 25px;
+  height: 45px;
+}
+
  .text-but {
     margin: 0 auto;
     justify-content: center; /* centra verticalmente */
     align-items: center;  
  }
 
+ .info-button {
+    background-color: #0000004f;
+    color: white;
+    margin-bottom: 5px;
+    max-width: 80%;
+    margin: 0 auto; 
+    margin-bottom: 5px;
+    height: 45px;
+ }
+
+.auth-label-short,
+.exit-icon {
+  display: none;
+}
+
+ /* ── Tablet (768px – 1199px) ─────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .menuLateral {
+    width: 100%;
+    min-width: 0;
+    
+  }
+
+  .menuNav {
+    width: fit-content;
+    padding-top: 10px;
+  }
+
+  .logo {
+    width: 46px;
+    height: 46px;
+    padding: 8px;
+    margin-top: 14px;
+  }
+
+  .logo-container {
+    margin-bottom: 12px;
+  }
+
+  .menu-btn {
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .butStyle {
+    max-width: 95%;
+    height: 40px;
+  }
+
+  .menuNav .text-but {
+    display: none;
+  }
+
+  .bottons-button .btn-special.enPlay {
+    width: 35px;
+    height: 35px;
+    margin: 8px auto;
+    padding: 0;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    letter-spacing: 0;
+  }
+
+  .bottons-button .auth-label-full {
+    display: none;
+  }
+
+  .bottons-button .auth-label-short {
+    display: inline;
+    line-height: 1;
+  }
+
+  .exit .exit-label {
+    display: none;
+  }
+
+  .exit .exit-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+  }
+
+  .exit {
+    width: 80%;
+    margin: 14px auto 20px;
+    font-size: 14px;
+  }
+}
+
+/* ── Mobile (max 767px) ──────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .menuLateral {
+    width: 100%;
+    height: 70px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    overflow-x: auto;
+    overflow-y: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    padding: 6px 10px;
+  }
+
+  .logo-container {
+    padding-left: 15px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    margin-top: 0;
+  }
+
+  .menuNav {
+    display: flex;
+    flex-direction: row;
+    max-width: none;
+    gap: 4px;
+    flex-wrap: nowrap;
+    padding-left: 20px;
+  }
+
+  nav {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .menu-btn {
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 10px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    width: auto;
+    height: 56px;
+  }
+
+  .menu-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .imgBut {
+    max-width: 22px;
+  }
+
+  .butStyle {
+    max-width: none;
+    height: auto;
+    margin: 0;
+  }
+
+  .menuNav .text-but {
+    display: none;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .bottons-button {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;                    /* Espaciado más limpio y controlado */
+}
+
+.bottons-button .btn-special.enPlay {
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    letter-spacing: 0;
+    flex-shrink: 0;
+}
+
+  .bottons-button .auth-label-full {
+    display: none;
+  }
+
+  .bottons-button .auth-label-short {
+    display: inline;
+    line-height: 1;
+  }
+
+  .exit {
+    margin-top: 26px;
+    height: 30px;
+    margin-inline: 15px;
+
+  }
+
+  .exit .exit-label {
+    display: none;
+  }
+
+  .exit .exit-icon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+}
