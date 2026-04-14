@@ -41,6 +41,7 @@ export default function ConfigMenu({
       { base: 600, increment: 0 },
       { base: 600, increment: 5 },
       { base: 900, increment: 10 },
+      { base: 0, increment: 0, isInfinite: true },
     ];
 
     // ✅ Llamar a onTimeChange en lugar de onStartGame
@@ -155,6 +156,7 @@ export default function ConfigMenu({
           <option value={7}>Rapid - 10 min</option>
           <option value={8}>Rapid - 10 | 5</option>
           <option value={9}>Rapid - 15 | 10</option>
+          <option value={10}>Infinito</option>
         </select>
       </div>
 

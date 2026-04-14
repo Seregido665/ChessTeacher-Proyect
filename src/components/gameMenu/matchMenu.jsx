@@ -21,6 +21,13 @@ export default function MatchMenu({
   onGameEnd,
   isAnalysisMode = false, // ✅ NUEVA prop para modo análisis
   match, // ✅ NUEVA prop para datos del match en análisis
+  currentMoveIndex,
+  onGoStart,
+  onPrevMove,
+  onNextMove,
+  onGoEnd,
+  onSelectMove,
+  moveQualities = [],
 }) {
   const { user } = useContext(AuthContext);
 
@@ -34,6 +41,13 @@ export default function MatchMenu({
         <AnalyzeMenu
           match={match}
           moveHistory={moveHistory}
+          moveQualities={moveQualities}
+          currentMoveIndex={currentMoveIndex}
+          onGoStart={onGoStart}
+          onPrevMove={onPrevMove}
+          onNextMove={onNextMove}
+          onGoEnd={onGoEnd}
+          onSelectMove={onSelectMove}
         />
       ) : isGameActive ? (
         // Modo PARTIDA EN CURSO

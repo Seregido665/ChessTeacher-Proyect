@@ -1,10 +1,16 @@
 import './matchCard.css';
 import { useNavigate } from 'react-router-dom';
+import { exportMatchAsPGN } from './exportPGN';
 
 const MatchCard = ({ match, onDelete, onExportPGN }) => {
   const navigate = useNavigate();
   const playerWon = match.winner === match.playerColor;
   const isDraw = match.winner === 'draw';
+
+  const handleExportPGN = () => {
+    const pgnText = exportMatchAsPGN(match);
+    onExportPGN?.(match, pgnText);
+  };
 
   const handleAnalyze = () => {
     navigate('/analysis', { state: { match } });
@@ -30,7 +36,7 @@ const MatchCard = ({ match, onDelete, onExportPGN }) => {
           </button>
           <button 
             className="btn-action btn-export" 
-            onClick={() => onExportPGN?.(match)}
+            onClick={handleExportPGN}
           >
             Exportar PGN
           </button>

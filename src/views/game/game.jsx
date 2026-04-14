@@ -28,6 +28,7 @@ const Juego = () => {
   const [timeLeft, setTimeLeft] = useState(300); // Tiempo por defecto: 5 minutos
   const [increment, setIncrement] = useState(0);
   const [baseTime, setBaseTime] = useState(300); // Guardar el tiempo base seleccionado
+  const [isInfiniteTime, setIsInfiniteTime] = useState(false);
   const timerRef = useRef(null);
 
   const buildMatchData = () => {
@@ -74,8 +75,10 @@ const Juego = () => {
 
   // ✅ NUEVA FUNCIÓN: Solo configurar el tiempo, NO iniciar el timer
   const handleTimeChange = (timeControl) => {
-    setTimeLeft(timeControl.base);
-    setBaseTime(timeControl.base);
+    const infinite = Boolean(timeControl?.isInfinite);
+    setIsInfiniteTime(infinite);
+    setTimeLeft(infinite ? Infinity : timeControl.base);
+    setBaseTime(infinite ? 0 : timeControl.base);
     setIncrement(timeControl.increment);
   };
 
@@ -96,7 +99,7 @@ const Juego = () => {
     setMoveHistory([]);
     setBoardEvaluation(0);
     setGameResult(null);
-    setTimeLeft(baseTime);
+    setTimeLeft(isInfiniteTime ? Infinity : baseTime);
 
     // ✅ TERCERO: Forzar reinicio del tablero
     setResetKey(prev => prev + 1);
@@ -104,7 +107,9 @@ const Juego = () => {
     // ✅ CUARTO: Iniciar el juego con un pequeño delay para asegurar que el reset se completó
     setTimeout(() => {
       setGameStarted(true);
-      startTimer();
+      if (!isInfiniteTime) {
+        startTimer();
+      }
     }, 100);
   };
 
@@ -120,7 +125,7 @@ const Juego = () => {
 
   const handleReset = () => {
     clearInterval(timerRef.current);
-    setTimeLeft(baseTime); // ✅ Restaurar al tiempo base configurado
+    setTimeLeft(isInfiniteTime ? Infinity : baseTime); // ✅ Restaurar al tiempo base configurado
     setGameStarted(false);
     setMoveHistory([]);
     setBoardEvaluation(0);
@@ -129,6 +134,8 @@ const Juego = () => {
   };
 
   const startTimer = () => {
+    if (isInfiniteTime) return;
+
     clearInterval(timerRef.current);
 
     timerRef.current = setInterval(() => {
@@ -180,6 +187,10 @@ const Juego = () => {
     }
   }, [moveHistory, gameStarted, selectedColor, increment]);
 
+  const formattedTime = isInfiniteTime
+    ? '∞'
+    : `${String(Math.floor(timeLeft / 60)).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`;
+
   // Loader si autenticación está cargando
   if (isAuthLoading) {
     return (
@@ -211,7 +222,7 @@ const Juego = () => {
 
           <div className="">
             <div className="board-header">
-              <span className="username">Oponente </span>
+              <span className="username">Dificultad {difficulty}</span>
             </div>
             
             {/* TABLERO DE AJEDREZ */}
@@ -230,8 +241,7 @@ const Juego = () => {
               <span className="username"> {user?.name || "Invitado"} </span>
               <div className="right">
                 <span className="tiempo">
-                  {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
-                  {String(timeLeft % 60).padStart(2, "0")}
+                  {formattedTime}
                 </span>
               </div>
             </div>
