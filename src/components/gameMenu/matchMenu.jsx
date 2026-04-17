@@ -8,7 +8,7 @@ import "./matchMenu.css";
 export default function MatchMenu({
   gameStarted,
   onStartGame,
-  onTimeChange, // ✅ NUEVA prop
+  onTimeChange, 
   onResetGame,
   selectedColor,
   setSelectedColor,
@@ -19,8 +19,8 @@ export default function MatchMenu({
   gameResult,
   onSaveGame,
   onGameEnd,
-  isAnalysisMode = false, // ✅ NUEVA prop para modo análisis
-  match, // ✅ NUEVA prop para datos del match en análisis
+  isAnalysisMode = false, 
+  match,
   currentMoveIndex,
   onGoStart,
   onPrevMove,
@@ -57,7 +57,7 @@ export default function MatchMenu({
           selectedColor={selectedColor}
         />
       ) : (
-        // Modo CONFIGURACIÓN (inicio o después de terminar)
+        // Modo CONFIGURACIÓN 
         <ConfigMenu
           gameStarted={gameStarted}
           showResult={showResult}
@@ -70,7 +70,7 @@ export default function MatchMenu({
           user={user}
           onSaveGame={onSaveGame}
           onStartGame={onStartGame}
-          onTimeChange={onTimeChange} // ✅ Pasar la nueva prop
+          onTimeChange={onTimeChange} 
           onResetGame={onResetGame}
         />
       )}

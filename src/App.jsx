@@ -7,7 +7,7 @@ import Juego from "./views/game/game"
 import Ejercicios from "./views/exercises/exercises"
 import Documentation from "./views/rules/documentation"
 import Analisis from "./views/analisis/analisis"
-import { ProtectedRoute, PublicRoute } from './components/ProtectedRoutes';
+import { PublicRoute } from './components/ProtectedRoutes';       // LIMITA EL ACCESO A CIERTAS VENTANAS.
 
 function App() {
   return (
@@ -38,15 +38,6 @@ function App() {
               </PublicRoute>
             } 
           />
-          {/*<Route path="/user/:id" element={<UserDetail />} />*/}
-          {/*<Route 
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />*/}
 
           
           <Route path="/game" element={<Juego />} />

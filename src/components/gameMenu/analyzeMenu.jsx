@@ -13,9 +13,9 @@ export default function AnalyzeMenu({
 }) {
   const currentMovePosition = currentMoveIndex - 1;
 
+  // -- CALIDAD DE JUGADAS --
   const getMoveQualityClass = (index) => {
     const quality = moveQualities[index];
-
     if (quality === "Buena") return "move-quality-good";
     if (quality === "ErrorLeve") return "move-quality-light-error";
     if (quality === "ErrorGrade") return "move-quality-severe-error";
@@ -23,6 +23,7 @@ export default function AnalyzeMenu({
     return "";
   };
 
+  // -- FUNCIONAMIENTO DE LAS TECLAS DE NAVEGACION --
   useEffect(() => {
     const handleKeyDown = (event) => {
       const target = event.target;
@@ -38,23 +39,19 @@ export default function AnalyzeMenu({
         event.preventDefault();
         onPrevMove?.();
       }
-
       if (event.key === "ArrowRight" && currentMoveIndex < moveHistory.length) {
         event.preventDefault();
         onNextMove?.();
       }
-
       if (event.key === "ArrowUp" && currentMoveIndex > 0) {
         event.preventDefault();
         onGoStart?.();
       }
-
       if (event.key === "ArrowDown" && currentMoveIndex < moveHistory.length) {
         event.preventDefault();
         onGoEnd?.();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
@@ -73,7 +70,7 @@ export default function AnalyzeMenu({
     <div className="analyze-menu-container">
       <h5 className="text-center mb-3">Análisis de Partida</h5>
 
-      {/* Historial de movimientos */}
+      {/* - HISTORIAL DE MOVIMIENTOS - */}
       <div className="move-history mb-4">
         <div className="move-table">
           <div className="table-header">
@@ -104,6 +101,7 @@ export default function AnalyzeMenu({
         </div>
       </div>
 
+      {/* - TECLAS DE NAVEGACION - */}
       <div className="analyze-controls">
         <button
           type="button"

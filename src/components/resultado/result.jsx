@@ -5,9 +5,8 @@ import "./reuslt.css";
 const Result = ({ isGameOver, result, saveMatch }) => {
   const { user } = useContext(AuthContext);
 
-  if (!isGameOver) return null;
-
-  const isButtonDisabled = !user; // Desactivar si no hay usuario
+  // - SI NO HAY USUARIO DESACTIVA EL BOTÓN -
+  const isButtonDisabled = !user; 
 
   return (
     <div className="result-overlay">
@@ -17,7 +16,7 @@ const Result = ({ isGameOver, result, saveMatch }) => {
         <button
           className="result-button"
           onClick={saveMatch}
-          disabled={isButtonDisabled} // ✅ desactivado si no hay user
+          disabled={isButtonDisabled} 
           title={isButtonDisabled ? "Debes iniciar sesión para guardar la partida" : ""}
         >
           Guardar partida

@@ -14,12 +14,12 @@ export default function PromotionSelector({ color, onSelect }) {
   return (
     <div className="promotion-overlay">
       <div className="promotion-box">
-        {pieces.map(p => (
+        {pieces.map(piece => (
           <img
-            key={p}
-            src={`/piezas/${colorLetter}${PIECE_KEY[p]}.png`}
-            alt={p}
-            onClick={() => onSelect(p)}
+            key={piece}
+            src={`/piezas/${colorLetter}${PIECE_KEY[piece]}.png`}
+            alt={piece}
+            onClick={() => onSelect(piece)}
           />
         ))}
       </div>

@@ -20,7 +20,6 @@ const ChessGame = ({
   const [boardWidth, setBoardWidth] = useState(400);
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [legalMoves, setLegalMoves] = useState([]);
-  
   const stockfish = useRef(null);
   const gameOverRef = useRef(false);
   const gameRef = useRef(game);
@@ -29,11 +28,12 @@ const ChessGame = ({
     gameRef.current = game;
   }, [game]);
 
+  // --- ORIENTACION DEL TABLERO ---
   useEffect(() => {
     setBoardOrientation(selectedColor === 'black' ? 'black' : 'white');
   }, [selectedColor]);
 
-  // Responsive board size
+  // --- AJUSTA EL TAMAÑO DEL TABLERO ---
   useEffect(() => {
     const updateBoardSize = () => {
       const heightBased = window.innerHeight * 0.8;
@@ -46,43 +46,39 @@ const ChessGame = ({
     return () => window.removeEventListener('resize', updateBoardSize);
   }, []);
 
+  // --- MOVIMIENTO DE PIEZAS ---
   const makeMove = useCallback((moveData) => {
     try {
       const currentGame = gameRef.current;
       const moveResult = currentGame.move(moveData);
 
       if (moveResult) {
-        console.log(`✅ Movimiento realizado: ${moveResult.san}`);
-
         const newGame = new Chess(currentGame.fen());
         setGame(newGame);
-        
-        // Limpiar selección después de un movimiento exitoso
         setSelectedSquare(null);
         setLegalMoves([]);
 
         if (onMoveHistory) {
           onMoveHistory(prev => [...prev, moveResult.san]);
         }
-
         return true;
       }
     } catch (error) {
-      console.error("❌ Error al hacer movimiento:", error);
+      console.error(error);
     }
     return false;
   }, [onMoveHistory]);
 
-  // Función para obtener movimientos legales de una pieza en una casilla
+  // --- MOVIMIENTOS LEGALES ---
   const getLegalMoves = useCallback((square) => {
     const currentGame = gameRef.current;
     const moves = currentGame.moves({ square, verbose: true });
     return moves.map(move => move.to);
   }, []);
 
-  // Función para manejar clicks en casillas
+  // --- MANEJO DE CLICS EN CASILLAS ---
   const onSquareClick = useCallback((square) => {
-    if (!gameStarted || isThinking) return;
+    if (isThinking) return;
 
     const currentGame = gameRef.current;
     const isPlayerTurn = (selectedColor === 'white' && currentGame.turn() === 'w') ||
@@ -90,79 +86,61 @@ const ChessGame = ({
 
     if (!isPlayerTurn) return;
 
-    // Si hay una casilla seleccionada y clickeamos en una casilla legal, hacer movimiento
+    // - SI HAY UNA PIEZA SELECCIONADA Y EL CLICK ES EN UN MOVIMIENTO LEGAL → HACER MOVIMIENTO -
     if (selectedSquare && legalMoves.includes(square)) {
       const moveSuccess = makeMove({
         from: selectedSquare,
         to: square,
-        promotion: 'q', // Por defecto promover a dama
+        promotion: 'q', 
       });
-      
-      if (moveSuccess) {
-        console.log(`👤 Movimiento por click: ${selectedSquare} -> ${square}`);
-      }
       return;
     }
 
-    // Verificar si hay una pieza en la casilla clickeada
+    // - SELECCIONA LA PIEZA CLICADA -
     const piece = currentGame.get(square);
-    
     if (piece) {
-      // Verificar que la pieza pertenece al jugador actual
       const isPieceOwnedByPlayer = (selectedColor === 'white' && piece.color === 'w') ||
                                    (selectedColor === 'black' && piece.color === 'b');
-      
       if (isPieceOwnedByPlayer) {
-        // Seleccionar nueva pieza y obtener sus movimientos legales
         setSelectedSquare(square);
         const moves = getLegalMoves(square);
         setLegalMoves(moves);
-        console.log(`🔍 Pieza seleccionada en ${square} con ${moves.length} movimientos legales:`, moves);
         return;
       }
     }
-
-    // Si clickeamos en una casilla vacía o una pieza enemiga, deseleccionar
     setSelectedSquare(null);
     setLegalMoves([]);
   }, [gameStarted, isThinking, selectedColor, selectedSquare, legalMoves, makeMove, getLegalMoves]);
 
-  // Stockfish initialization
+  // --- INICIAR STOCKFISH ---
   useEffect(() => {
-    console.log("🔧 Inicializando Stockfish");
     const worker = new Worker('/stockfish.js');
     stockfish.current = worker;
 
     worker.postMessage('uci');
     worker.postMessage('isready');
-
     worker.onmessage = (e) => {
       const line = e.data;
 
-      // Best move from AI
+      // // --- MOVIMIENTO DE LA IA ---
       if (line.includes('bestmove')) {
         const moveStr = line.split(' ')[1];
         if (moveStr && moveStr !== '(none)') {
-          console.log("🤖 Stockfish sugiere:", moveStr);
           makeMove(moveStr);
           setIsThinking(false);
         }
       }
 
-      // Evaluation (score cp)
+      // // --- EVALUACIÓN DE LA BARRA DE VENTAJA ---
       if (line.includes('score cp')) {
         const parts = line.split(' ');
         const cpIndex = parts.indexOf('cp') + 1;
         if (cpIndex > 0 && cpIndex < parts.length) {
           let cp = parseInt(parts[cpIndex], 10);
 
-          // NORMALIZACIÓN: hacer que siempre sea desde la perspectiva de las blancas
-          // Si es turno de negras → invertir el signo
           if (gameRef.current.turn() === 'b') {
             cp = -cp;
           }
-
-          console.log(`Evaluación normalizada (perspectiva blancas): ${cp}`);
           if (onEvaluation) onEvaluation(cp);
         }
       }
@@ -174,7 +152,7 @@ const ChessGame = ({
     };
   }, [makeMove, onEvaluation]);
 
-  // Reset completo
+  // --- RESET COMPLETO DEL JUEGO ---
   useEffect(() => {
     const newGame = new Chess();
     setGame(newGame);
@@ -182,7 +160,6 @@ const ChessGame = ({
     setIsThinking(false);
     gameOverRef.current = false;
     
-    // Limpiar selección al reiniciar
     setSelectedSquare(null);
     setLegalMoves([]);
 
@@ -195,16 +172,15 @@ const ChessGame = ({
     }
   }, [resetKey]);
 
-  // Turno de la IA
+  // --- TURNO DE LA IA ---
   useEffect(() => {
-    if (!gameStarted || isThinking || gameRef.current.isGameOver()) return;
+    if (isThinking || gameRef.current.isGameOver()) return;
 
     const turn = gameRef.current.turn();
     const isAiTurn = (selectedColor === 'white' && turn === 'b') ||
                      (selectedColor === 'black' && turn === 'w');
 
     if (isAiTurn && stockfish.current) {
-      console.log("🤖 Es turno de la IA - Turn:", turn, "Player:", selectedColor);
       setIsThinking(true);
 
       const levels = {
@@ -228,7 +204,7 @@ const ChessGame = ({
     }
   }, [game, gameStarted, selectedColor, difficulty, isThinking]);
 
-  // Detección de fin de juego
+  // --- DETECTA EL FIN DE LA PARTIDA ---
   useEffect(() => {
     if (gameRef.current.isGameOver() && !gameOverRef.current) {
       gameOverRef.current = true;
@@ -246,16 +222,15 @@ const ChessGame = ({
     }
   }, [game, onGameEnd]);
 
+  // --- MANEJO DE MOVIMIENTOS POR DRAG & DROP ---
   function onDrop(sourceSquare, targetSquare) {
-    if (!gameStarted || isThinking) return false;
+    if (isThinking) return false;
 
     const currentGame = gameRef.current;
     const isPlayerTurn = (selectedColor === 'white' && currentGame.turn() === 'w') ||
                          (selectedColor === 'black' && currentGame.turn() === 'b');
 
     if (!isPlayerTurn) return false;
-
-    console.log(`👤 Movimiento humano por arrastrar: ${sourceSquare} -> ${targetSquare}`);
     
     return makeMove({
       from: sourceSquare,
@@ -264,11 +239,11 @@ const ChessGame = ({
     });
   }
 
-  // Generar estilos personalizados para las casillas (solo la seleccionada)
+  // --- GENERAR ESTILOS PARA LAS CASILLAS ---
   const getCustomSquareStyles = () => {
     const styles = {};
     
-    // Resaltar casilla seleccionada
+    // - RESALTAR CASILLA SELECCIONADA -
     if (selectedSquare) {
       styles[selectedSquare] = { 
         backgroundColor: 'rgba(255, 255, 0, 0.6)',
@@ -276,7 +251,7 @@ const ChessGame = ({
       };
     }
     
-    // Cursor pointer en casillas legales
+    // - PUNTO EN CASILLAS LEGALES -
     legalMoves.forEach(square => {
       styles[square] = { cursor: 'pointer' };
     });
@@ -284,7 +259,7 @@ const ChessGame = ({
     return styles;
   };
 
-  // Calcula la posición en píxeles (top-left) de una casilla dada la orientación
+  // --- CALCULAR POSICIÓN DE LOS CÍRCULOS DE MOVIMIENTOS LEGALES ---
   const getSquarePosition = (square) => {
     const file = square.charCodeAt(0) - 'a'.charCodeAt(0); // 0-7
     const rank = parseInt(square[1]) - 1;                  // 0-7
@@ -325,7 +300,7 @@ const ChessGame = ({
         }}
       />
 
-      {/* Overlay para los círculos de movimientos legales (por encima de las piezas) */}
+      {/* - MUESTRA CÍRCULOS CON LOS MOVIMIENTOS LEGALES - */}
       <div
         className="chessgame-overlay"
         style={{ width: boardWidth, height: boardWidth }}

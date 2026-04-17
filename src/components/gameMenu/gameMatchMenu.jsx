@@ -8,7 +8,7 @@ export default function GameMatchMenu({
 }) {
   const historyEndRef = useRef(null);
 
-  // Scroll automático al último movimiento
+  // --- SCROLL VERTICAL ---
   useEffect(() => {
     if (historyEndRef.current) {
       historyEndRef.current.scrollIntoView({ behavior: 'smooth' });

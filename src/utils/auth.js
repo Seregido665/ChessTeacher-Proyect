@@ -1,4 +1,4 @@
-// --- USOS DEL TOKEN EN EL FRONTEND ---
+// --- USOS DEL TOKEN ---
 
 // -- OBTENER TOKEN --
 export const getToken = () => {

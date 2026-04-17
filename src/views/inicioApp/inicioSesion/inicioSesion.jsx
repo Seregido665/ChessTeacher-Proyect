@@ -48,14 +48,7 @@ const Sesion = () => {
                 navigate('/game');
             })
             .catch((err) => {
-                const serverMessage = err.response?.data?.message;
-                if (serverMessage === "El usuario no existe") {
-                    setErrors({ email: { message: serverMessage } });
-                } else if (serverMessage === "Contraseña incorrecta") {
-                    setErrors({ password: { message: serverMessage } });
-                } else {
-                    setErrors({ general: { message: serverMessage || "Error al conectar" } });
-                }
+                console.log(err);
             }
         );
     };

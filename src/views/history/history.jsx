@@ -9,37 +9,21 @@ import { buildMatchDataFromPgnFile } from '../../utils/importPGN';
 const Historial = () => {
   const { user } = useContext(AuthContext);
   const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
   const isLoggedIn = !!user;
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-  if (!user) {
-    setMatches([]);
-    setError(null);
-    setLoading(false);
-    return;
-  }
-
-  setLoading(true);
-
-  const fetchMatches = async () => {
-    try {
-      const response = await getMatches();
-
-      setMatches(response.data);
-    } catch (err) {
-      console.error("Error al cargar", err);
-      setError('Error al cargar el historial de partidas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchMatches();
-}, [user]);
+    const fetchMatches = async () => {
+      try {
+        const response = await getMatches();
+        setMatches(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMatches();
+  }, [user]);
 
   // -- ELIMINAR PARTIDA --
   const handleDelete = async (matchId) => {
@@ -47,26 +31,19 @@ const Historial = () => {
       await deleteMatch(matchId);
       setMatches((prevMatches) => prevMatches.filter(m => m.id !== matchId));
     } catch (err) {
-      console.error("Error al eliminar partida:", err);
+      console.error(err);
     }
   };
 
   const getUserId = () => user?._id || user?.user?._id;
 
   const handleImportClick = () => {
-
     fileInputRef.current?.click();
   };
 
   const handleImportPGN = async (event) => {
     const file = event.target.files?.[0];
-    event.target.value = '';
-
-    if (!file) return;
-
     const userId = getUserId();
-
-    setIsImporting(true);
 
     try {
       const matchData = await buildMatchDataFromPgnFile(file, userId);
@@ -75,14 +52,10 @@ const Historial = () => {
 
       if (importedMatch) {
         setMatches((prev) => [importedMatch, ...prev]);
-      } else {
-        const refreshed = await getMatches();
-        setMatches(refreshed.data || []);
       }
-    } catch (importError) {
-      console.error('Error al importar PGN:', importError);
-    } finally {
-      setIsImporting(false);
+      
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -119,14 +92,14 @@ const Historial = () => {
             </div>
           )}
 
-          {isLoggedIn && !loading && !error && matches.length === 0 && (
+          {isLoggedIn && matches.length === 0 && (
             <div className="text-white text-center">
               <p>No tienes partidas guardadas aún</p>
               <p>¡Juega tu primera partida!</p>
             </div>
           )}
 
-          {isLoggedIn && !loading && matches.length > 0 && (
+          {isLoggedIn && matches.length > 0 && (
             <div 
               className="matchList w-100"
               style={{ 

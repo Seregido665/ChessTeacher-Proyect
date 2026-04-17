@@ -11,9 +11,6 @@ export const loginUser = (userData) => {
 export const getUserProfile = () => {
   return apiClient.get("/profile");
 };
-/*export const getUserById = (id) => {
-  return apiClient.get(`/user/${id}`);
-};*/
 
 export const deleteUser = (id) => {
   return apiClient.delete(`/user/${id}`);

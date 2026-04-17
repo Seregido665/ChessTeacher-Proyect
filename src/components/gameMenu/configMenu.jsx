@@ -12,7 +12,7 @@ export default function ConfigMenu({
   user,
   onSaveGame,
   onStartGame,
-  onTimeChange, // ✅ NUEVA prop para cambiar tiempo sin iniciar
+  onTimeChange, 
   onResetGame,
 }) {
   const [localDifficulty, setLocalDifficulty] = useState(3);
@@ -25,7 +25,7 @@ export default function ConfigMenu({
     setDifficulty?.(value);
   };
 
-  // ✅ MODIFICADO: Solo cambia el tiempo mostrado, NO inicia la partida
+  // --- SOLO CAMBIA EL TIEMPO, NO INICIA PARTIDA ---
   const handleTimeChange = (e) => {
     const value = Number(e.target.value);
     setTimeIndex(value);
@@ -43,26 +43,25 @@ export default function ConfigMenu({
       { base: 900, increment: 10 },
       { base: 0, increment: 0, isInfinite: true },
     ];
-
-    // ✅ Llamar a onTimeChange en lugar de onStartGame
     onTimeChange?.(options[value]);
   };
 
   const handleSave = () => {
-    if (hasSaved || !user) return;
+    if (hasSaved) return;
     setHasSaved(true);
     onSaveGame?.();
   };
 
-  // ✅ MODIFICADO: Iniciar nueva partida
+  // --- NUEVA PARTIDA ---
   const handleNewGame = () => {
     setHasSaved(false);
     if (showResult) {
       onResetGame?.();
     }
-    onStartGame?.(); // ✅ Ya no pasa timeControl, se usa el configurado
+    onStartGame?.(); 
   };
 
+  // --- RENDICIÓN ---
   const getResultText = () => {
     if (!gameResult) return "";
     if (gameResult.reason === "checkmate") {
@@ -86,6 +85,7 @@ export default function ConfigMenu({
         </button>
       </div>
 
+      {/* - SELECCIONAR COLOR - */}
       <div className="mb-3">
         <div className="color-selector d-flex justify-content-center gap-3">
           <button
@@ -106,6 +106,7 @@ export default function ConfigMenu({
         </div>
       </div>
 
+      {/* - BARRA DE VENTAJA - */}
       <div className="form-check text-start mb-2">
         <input
           className="form-check-input"
@@ -119,6 +120,7 @@ export default function ConfigMenu({
         </label>
       </div>
 
+      {/* - DIFICULTAD - */}
       <div className="subMenu mb-2">
         <label className="form-label mb-1 d-block">Dificultad</label>
         <select
@@ -139,6 +141,7 @@ export default function ConfigMenu({
         </select>
       </div>
 
+      {/* - DURACIÓN - */}
       <div className="subMenu mb-4">
         <label className="form-label mb-1 d-block">Duración</label>
         <select
@@ -160,6 +163,7 @@ export default function ConfigMenu({
         </select>
       </div>
 
+      {/* - RESULTADO Y GUARDADO - */}
       {showResult && (
         <div className="text-center mt-4">
           <p className="result pb-1 mb-4 fs-4 fw-bold">

@@ -13,8 +13,6 @@ const Juego = () => {
   
   useEffect(() => {
     console.log("💡 Usuario actual:", user);
-    console.log("💡 user._id:", user?._id || "No logueado");
-    console.log("💡 isAuthLoading:", isAuthLoading);
   }, [user, isAuthLoading]);
 
   const [gameStarted, setGameStarted] = useState(false);
@@ -33,11 +31,6 @@ const Juego = () => {
 
   const buildMatchData = () => {
     const userId = user?._id || user?.user?._id;
-    
-    if (!userId || !gameResult?.winner) {
-      console.error("❌ No se puede construir matchData - userId:", userId, "o ganador faltante");
-      return null;
-    }
 
     return {
       user: userId,
@@ -51,29 +44,19 @@ const Juego = () => {
     };
   };
 
+  // --- GUARDAR PARTIDA ---
   const handleSaveGame = () => {
     if (isAuthLoading || !user) {
-      console.warn("⚠️ Esperando autenticación o usuario no disponible");
       return;
     }
 
-    const matchData = buildMatchData();
-    console.log("📝 matchData generado:", matchData);
-    
-    if (!matchData) return;
-    
+    const matchData = buildMatchData();    
     saveMatch(matchData)
       .then(() => console.log("✅ Partida guardada"))
       .catch(err => console.error("❌ Error al guardar:", err.response?.data));
   };
 
-  // DEBUG: Monitorear historial
-  useEffect(() => {
-    console.log("📊 HISTORIAL EN PADRE:", moveHistory);
-    console.log(`📊 Total: ${moveHistory.length} movimientos`);
-  }, [moveHistory]);
-
-  // ✅ NUEVA FUNCIÓN: Solo configurar el tiempo, NO iniciar el timer
+  // --- ELIGE TIEMPO, PERO NO LO INICIA ---
   const handleTimeChange = (timeControl) => {
     const infinite = Boolean(timeControl?.isInfinite);
     setIsInfiniteTime(infinite);
@@ -82,7 +65,7 @@ const Juego = () => {
     setIncrement(timeControl.increment);
   };
 
-  // ✅ MODIFICADO: Forzar reinicio completo del tablero al iniciar partida
+  // --- INICIA LA PARTIDA
   const handleStart = () => {
     let finalColor = selectedColor;
 
@@ -91,20 +74,18 @@ const Juego = () => {
       setSelectedColor(finalColor);
     }
 
-    // ✅ PRIMERO: Detener cualquier juego en curso
+    // -- REINICIA LA INFO DE LA PARTIDA ANTERIOR --
     setGameStarted(false);
     clearInterval(timerRef.current);
-
-    // ✅ SEGUNDO: Limpiar todo el estado
     setMoveHistory([]);
     setBoardEvaluation(0);
     setGameResult(null);
     setTimeLeft(isInfiniteTime ? Infinity : baseTime);
 
-    // ✅ TERCERO: Forzar reinicio del tablero
+    // -- FUERZA EL REINICIO DEL TABLERO --
     setResetKey(prev => prev + 1);
 
-    // ✅ CUARTO: Iniciar el juego con un pequeño delay para asegurar que el reset se completó
+    // -- INICIA EL JUEGO DESPUÉS DE UN DELAY (100ms) PARA ASEGURAR QUE TODO SE REINICIE CORRECTAMENTE --
     setTimeout(() => {
       setGameStarted(true);
       if (!isInfiniteTime) {
@@ -113,9 +94,10 @@ const Juego = () => {
     }, 100);
   };
 
+  // --- FINAL DE PARTIDA --
   const handleGameEnd = (data) => {
-    clearInterval(timerRef.current); // Detener timer cuando termina el juego
-    setGameStarted(false); // ✅ Marcar que el juego terminó
+    clearInterval(timerRef.current);
+    setGameStarted(false); 
     setGameResult({
       winner: data.winner || "draw",   
       reason: data.reason || "unknown",
@@ -123,6 +105,7 @@ const Juego = () => {
     });
   };
 
+  // --- TABLERO A SU ESTADO INICIA ---
   const handleReset = () => {
     clearInterval(timerRef.current);
     setTimeLeft(isInfiniteTime ? Infinity : baseTime); // ✅ Restaurar al tiempo base configurado
@@ -133,6 +116,7 @@ const Juego = () => {
     setResetKey(prev => prev + 1);
   };
 
+  // --- CONTADOR DE TIEMPO ---
   const startTimer = () => {
     if (isInfiniteTime) return;
 
@@ -154,7 +138,7 @@ const Juego = () => {
     }, 1000);
   };
 
-  // Effect para detener el timer si gameStarted cambia a false
+  // --- DETIENE EL TIEMPO CUANDO TERMINA LA PARTIDA ---
   useEffect(() => {
     if (!gameStarted && timerRef.current) {
       clearInterval(timerRef.current);
@@ -162,19 +146,9 @@ const Juego = () => {
     }
   }, [gameStarted]);
 
-  // Cleanup al desmontar el componente
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  // Añadir incremento de tiempo después de cada movimiento del jugador
+  // --- AÑADIR INCREMENTO DE TIEMPO DESPUÉS DE CADA MOVIMIENTO DEL JUGADOR ---
   useEffect(() => {
     if (!gameStarted) return;
-    if (moveHistory.length === 0) return;
 
     const lastMoveIndex = moveHistory.length - 1;
 
@@ -191,16 +165,6 @@ const Juego = () => {
     ? '∞'
     : `${String(Math.floor(timeLeft / 60)).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`;
 
-  // Loader si autenticación está cargando
-  if (isAuthLoading) {
-    return (
-      <div className="vh-100 d-flex align-items-center justify-content-center">
-        <div>Cargando usuario... Por favor espera.</div>
-      </div>
-    );
-  }
-
-  // Si no hay usuario, puede seguir jugando pero sin guardar partidas
 
   return (
     <div className="vh-100 img-fondo2">
