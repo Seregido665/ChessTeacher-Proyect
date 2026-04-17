@@ -3,6 +3,7 @@ import AsideMenu from '../../components/asideMenu/aside';
 import MatchMenu from '../../components/gameMenu/matchMenu';
 import EvaluationBar from '../../components/advantageBar/advantageBar';
 import ChessGame from '../../components/chessboard/ChessGame'; 
+import useClue from '../../components/gameMenu/clue';
 import { useState, useEffect, useRef } from 'react';
 import { useContext } from "react";
 import { saveMatch } from "../../services/match.service";
@@ -27,6 +28,8 @@ const Juego = () => {
   const [increment, setIncrement] = useState(0);
   const [baseTime, setBaseTime] = useState(300); // Guardar el tiempo base seleccionado
   const [isInfiniteTime, setIsInfiniteTime] = useState(false);
+  const [currentFen, setCurrentFen] = useState('start');
+  const { clueArrow, handleClue, clearClue } = useClue(currentFen);
   const timerRef = useRef(null);
 
   const buildMatchData = () => {
@@ -199,6 +202,8 @@ const Juego = () => {
                 difficulty={difficulty}
                 onGameEnd={handleGameEnd}
                 onSaveGame={handleSaveGame}
+                onFenChange={(fen) => { setCurrentFen(fen); clearClue(); }}
+                clueArrow={clueArrow}
               />
               
               <div className="board-footer">
@@ -228,6 +233,7 @@ const Juego = () => {
             gameResult={gameResult}
             onSaveGame={handleSaveGame}
             onGameEnd={handleGameEnd}
+            onClue={handleClue}
           />
         </div>
       </div>

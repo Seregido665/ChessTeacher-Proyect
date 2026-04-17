@@ -1,12 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
+import AuthContext from '../../context/authContext';
 import "./matchMenu.css";
 
 export default function GameMatchMenu({
   moveHistory = [],
   onGameEnd,
   selectedColor,
+  onClue,
 }) {
   const historyEndRef = useRef(null);
+  const { isAuthenticated } = useContext(AuthContext);
 
   // --- SCROLL VERTICAL ---
   useEffect(() => {
@@ -48,6 +51,14 @@ export default function GameMatchMenu({
           <div ref={historyEndRef} />
         </div>
       </div>
+
+      {isAuthenticated && (
+        <div className="text-center mt-2">
+          <button className="matchButton pista" onClick={onClue}>
+            MEJOR JUGADA
+          </button>
+        </div>
+      )}
 
       <div className="text-center mt-2">
         <button

@@ -83,14 +83,37 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.pista {
+  width: 200px;
+  height: 45px;
+  background: linear-gradient(135deg, #e4e4e441, #64646442);
+  color: #fff;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgb(0, 0, 0);
+  margin-bottom: 1.1rem;
+}
+
+.pista:hover {
+  background: linear-gradient(135deg, #8b8b8bb0, #6868683b);
+  box-shadow: 0 6px 18px rgb(0, 0, 0);
+  transform: translateY(-1px);
+}
+
+.pista:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgb(0, 0, 0);
+}
+
 .rendirse {
-  background: #b3b600a6; /* Rojo oscuro */
+  background: #ff18189a; 
   color: white;
   flex: 1;
+  border-radius: 5px;
 }
 
 .rendirse:hover {
-  background: #d4c600b7;
+  background: #d40000b7;
 }
 
 

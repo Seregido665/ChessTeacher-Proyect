@@ -12,6 +12,8 @@ const ChessGame = ({
   onEvaluation,
   difficulty,
   onGameEnd,
+  onFenChange,
+  clueArrow = [],
   className = ''
 }) => {
   const [game, setGame] = useState(() => new Chess());
@@ -60,6 +62,9 @@ const ChessGame = ({
 
         if (onMoveHistory) {
           onMoveHistory(prev => [...prev, moveResult.san]);
+        }
+        if (onFenChange) {
+          onFenChange(newGame.fen());
         }
         return true;
       }
@@ -294,6 +299,7 @@ const ChessGame = ({
         onSquareClick={onSquareClick}
         boardOrientation={boardOrientation}
         customSquareStyles={getCustomSquareStyles()}
+        customArrows={clueArrow}
         customBoardStyle={{
           borderRadius: "4px",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"

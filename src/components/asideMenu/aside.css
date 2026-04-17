@@ -277,6 +277,13 @@ nav {
     margin: 0;
   }
 
+   .butStyle2 {
+    margin-inline: 30px;
+    max-width: none;
+    height: auto;
+    margin: 0;
+  }
+
   .menuNav .text-but {
     display: none;
   }

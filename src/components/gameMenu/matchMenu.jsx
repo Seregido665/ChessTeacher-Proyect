@@ -19,6 +19,7 @@ export default function MatchMenu({
   gameResult,
   onSaveGame,
   onGameEnd,
+  onClue,
   isAnalysisMode = false, 
   match,
   currentMoveIndex,
@@ -55,6 +56,7 @@ export default function MatchMenu({
           moveHistory={moveHistory}
           onGameEnd={onGameEnd}
           selectedColor={selectedColor}
+          onClue={onClue}
         />
       ) : (
         // Modo CONFIGURACIÓN 
